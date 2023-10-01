@@ -9,3 +9,5 @@ services:
     envVars:
       - key: NITRO_PRESET
         value: render_com
+      - key: NODE_VERSION
+        value: 18.18.0
