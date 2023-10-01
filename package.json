@@ -5,14 +5,19 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
-    "preview": "nuxt preview",
+    "db:generate": "drizzle-kit generate:sqlite",
+    "db:push": "drizzle-kit push:sqlite",
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
+    "better-sqlite3": "^8.7.0",
+    "drizzle-kit": "^0.19.13",
     "nuxt": "^3.7.3"
   },
   "dependencies": {
+    "@libsql/client": "^0.3.5",
+    "drizzle-orm": "^0.28.6",
     "zod": "^3.22.2"
   }
 }

@@ -1,7 +1,11 @@
 import { z } from "zod";
-import { wordleGame } from "../utils/wordleGame";
+import { getWordleGame } from "../models/getWordleGame";
+import { db } from "../db/db";
+import { attempt } from "../db/schema";
+import { WordleGameState } from "../models/WordleGame";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<WordleGameState> => {
+  // validate input
   const validation = z
     .object({
       word: z.array(z.string().length(1).regex(/[a-z]/)).length(5),
@@ -12,13 +16,19 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 400 });
   }
   const body = validation.data;
+
+  // update game state
+  const wordleGame = await getWordleGame();
   try {
-    const state = wordleGame.attempt(body.word, body.wordIndex);
-    if (state.status === "GAME_OVER") {
-      wordleGame.newGame();
-    }
-    return state;
+    wordleGame.attempt(body.word.join(""), body.wordIndex);
   } catch (error) {
     throw createError({ statusCode: 400 });
   }
+
+  // save attempt
+  await db
+    .insert(attempt)
+    .values({ gameId: wordleGame.id, word: body.word.join("") });
+
+  return wordleGame.state;
 });
