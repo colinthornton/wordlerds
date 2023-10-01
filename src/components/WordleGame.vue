@@ -27,6 +27,8 @@ const results = useState(
   (): CharResult[][] => state.value?.results ?? []
 );
 
+const keys = useState("WordleGame-keys", () => state.value?.keys ?? {});
+
 async function handlePress(key: string) {
   if (wordIndex === MAX_WORDS) return;
   if (resultPending) return;
@@ -39,6 +41,7 @@ async function handlePress(key: string) {
         throw createError(new Error("Something went wrong"));
       }
       results.value = state.results;
+      keys.value = state.keys;
       wordIndex++;
       charIndex = 0;
       if (state.status === "GAME_OVER") {
@@ -78,7 +81,7 @@ function sendAttempt() {
 <template>
   <main>
     <WordleBoard :words="words" :results="results" />
-    <WordleKeyboard @press="handlePress" />
+    <WordleKeyboard :key-mods="keys" @press="handlePress" />
   </main>
 </template>
 

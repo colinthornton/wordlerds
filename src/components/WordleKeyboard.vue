@@ -1,4 +1,8 @@
 <script setup lang="ts">
+const props = defineProps<{
+  keyMods: Record<string, CharResult>;
+}>();
+
 defineEmits<{
   (e: "press", key: string): void;
 }>();
@@ -8,12 +12,22 @@ const keys = [
   ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
   ["enter", "z", "x", "c", "v", "b", "n", "m", "backspace"],
 ];
+
+function getKeyClass(key: string) {
+  if (!(key in props.keyMods)) return;
+  return `key-${props.keyMods[key]}`;
+}
 </script>
 
 <template>
   <div class="keyboard">
     <div v-for="row of keys" class="row">
-      <button v-for="key of row" class="key" @click="$emit('press', key)">
+      <button
+        v-for="key of row"
+        class="key"
+        :class="getKeyClass(key)"
+        @click="$emit('press', key)"
+      >
         {{ key }}
       </button>
     </div>
@@ -50,5 +64,17 @@ const keys = [
   font-family: system-ui, sans-serif;
   font-weight: bold;
   text-transform: uppercase;
+}
+
+.key-0 {
+  background: lightgray;
+}
+
+.key-1 {
+  background: yellow;
+}
+
+.key-2 {
+  background: yellowgreen;
 }
 </style>

@@ -1,4 +1,8 @@
-import { CharResult, RESULT_CORRECT } from "~/utils/CharResult";
+import {
+  CharResult,
+  RESULT_CORRECT,
+  RESULT_NOT_FOUND,
+} from "~/utils/CharResult";
 
 export class WordleGame {
   private target: string = "";
@@ -10,8 +14,20 @@ export class WordleGame {
     return {
       attempts: this.attempts,
       results: this.results,
+      keys: this.keys,
       status: this.status,
     };
+  }
+
+  get keys() {
+    const keys = new Map<string, CharResult>();
+    this.attempts.forEach((attempt, i) => {
+      attempt.forEach((char, j) => {
+        const current = keys.get(char) ?? RESULT_NOT_FOUND;
+        keys.set(char, Math.max(current, this.results[i][j]) as CharResult);
+      });
+    });
+    return Object.fromEntries(keys);
   }
 
   constructor(private targets: string[], private dictionary: string[]) {
