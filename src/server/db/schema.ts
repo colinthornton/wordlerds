@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 
 // export const user = sqliteTable("user", {
@@ -17,6 +18,10 @@ export const game = sqliteTable("game", {
   solution: text("solution", { length: 5 }).notNull(),
 });
 
+export const gameRelations = relations(game, ({ many }) => ({
+  attempts: many(attempt),
+}));
+
 export const attempt = sqliteTable("attempt", {
   id: integer("id").primaryKey(),
   word: text("word", { length: 5 }).notNull(),
@@ -31,3 +36,10 @@ export const attempt = sqliteTable("attempt", {
     .notNull()
     .$defaultFn(() => new Date()),
 });
+
+export const attemptRelations = relations(attempt, ({ one }) => ({
+  game: one(game, {
+    fields: [attempt.gameId],
+    references: [game.id],
+  }),
+}));

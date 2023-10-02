@@ -38,12 +38,13 @@ export class WordleGame {
   constructor(
     private _id: number,
     private solution: string,
-    attempts: string[]
+    attempts: string[],
+    results: CharResult[][]
   ) {
-    attempts.forEach((word, i) => this.attempt(word, i));
+    attempts.forEach((word, i) => this.attempt(word, i, results[i]));
   }
 
-  attempt(word: string, wordIndex: number) {
+  attempt(word: string, wordIndex: number, result?: CharResult[]) {
     if (wordIndex !== this.attempts.length) {
       throw new WordleGameDesyncError();
     }
@@ -53,8 +54,10 @@ export class WordleGame {
     }
 
     this.attempts.push(word);
-    const result = this.getResult(word.split(""));
-    this.results.push(this.getResult(word.split("")));
+    if (!result) {
+      result = this.getResult(word.split(""));
+    }
+    this.results.push(result);
 
     if (result.every((r) => r === RESULT_CORRECT)) {
       this.status = "GAME_OVER";
@@ -63,6 +66,8 @@ export class WordleGame {
     if (this.attempts.length === 6) {
       this.status = "GAME_OVER";
     }
+
+    return result;
   }
 
   private getResult(attempt: string[]) {

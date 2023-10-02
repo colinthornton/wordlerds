@@ -23,11 +23,8 @@ export async function getDb(event: H3Event) {
       await migrate(db, { migrationsFolder: "./migrations" });
     }
 
-    const games = await db
-      .select({ id: schema.game.id })
-      .from(schema.game)
-      .limit(1);
-    if (!games.length) {
+    const game = await db.query.game.findFirst({ columns: { id: true } });
+    if (!game) {
       await seedGames(event);
     }
   }
