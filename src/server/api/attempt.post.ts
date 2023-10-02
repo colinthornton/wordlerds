@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { getWordleGame } from "../models/getWordleGame";
-import { db, attempt } from "../db";
+import { getDb, attempt } from "../db";
 import { WordleGameState } from "../models/WordleGame";
 
 export default defineEventHandler(async (event): Promise<WordleGameState> => {
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
   const body = validation.data;
 
   // update game state
-  const wordleGame = await getWordleGame();
+  const wordleGame = await getWordleGame(event);
   try {
     wordleGame.attempt(body.word.join(""), body.wordIndex);
   } catch (error) {
@@ -33,6 +33,7 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
     throw createError({ statusCode: 500 });
   }
   const result = resultNums.join("");
+  const db = await getDb(event);
   await db.insert(attempt).values({ gameId, word, result });
 
   return state;

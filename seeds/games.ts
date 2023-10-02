@@ -1,7 +1,9 @@
-import { db, game } from "~/server/db";
+import { game, getDb } from "~/server/db";
 import { targets } from "~/assets/targets";
+import { H3Event } from "h3";
 
-export async function seedGames() {
+export async function seedGames(event: H3Event) {
+  const db = await getDb(event);
   await db.delete(game);
 
   const shuffledSolutions = shuffle(targets);

@@ -1,8 +1,10 @@
 import { eq } from "drizzle-orm";
-import { db, attempt, game } from "../db";
+import { getDb, attempt, game } from "../db";
 import { WordleGame } from "./WordleGame";
+import { H3Event } from "h3";
 
-export async function getWordleGame(): Promise<WordleGame> {
+export async function getWordleGame(event: H3Event): Promise<WordleGame> {
+  const db = await getDb(event);
   const today = new Date().toISOString().slice(0, 10);
   const rows = await db
     .select({
