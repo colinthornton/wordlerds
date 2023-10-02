@@ -1,10 +1,7 @@
-import { db } from "~/server/db/db";
-import { game } from "~/server/db/schema";
+import { db, game } from "~/server/db";
 import { targets } from "~/assets/targets";
 
-main();
-
-async function main() {
+export async function seedGames() {
   await db.delete(game);
 
   const shuffledSolutions = shuffle(targets);

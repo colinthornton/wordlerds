@@ -1,6 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db } from "../db/db";
-import { attempt, game } from "../db/schema";
+import { db, attempt, game } from "../db";
 import { WordleGame } from "./WordleGame";
 
 export async function getWordleGame(): Promise<WordleGame> {
