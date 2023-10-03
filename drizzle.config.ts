@@ -5,7 +5,7 @@ export default {
   out: "./src/server/db/migrations",
   driver: "turso",
   dbCredentials: {
-    url: "file:local.db",
+    url: "file:./src/server/db/local.db",
   },
   breakpoints: true,
   verbose: true,

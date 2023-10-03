@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
+    "better-sqlite3": "^8.7.0",
     "drizzle-kit": "^0.19.13",
     "nuxt": "^3.7.4",
     "tsx": "^3.13.0"

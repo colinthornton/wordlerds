@@ -9,7 +9,7 @@ runMigrations();
 
 async function runMigrations() {
   const client = createClient({
-    url: process.env.NUXT_DATABASE_URL as string,
+    url: process.env.NUXT_DATABASE_URL ?? "file:./src/server/db/local.db",
     authToken: process.env.NUXT_DATABASE_AUTH_TOKEN,
   });
 
