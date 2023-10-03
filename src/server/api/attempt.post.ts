@@ -18,7 +18,8 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
   const body = validation.data;
 
   // update game state
-  const wordleGame = await getWordleGame(event);
+  const db = getDb(event);
+  const wordleGame = await getWordleGame(db);
   let result: CharResult[];
   try {
     result = wordleGame.attempt(body.word.join(""), body.wordIndex);
@@ -29,7 +30,6 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
   // save attempt
   const gameId = wordleGame.id;
   const word = body.word.join("");
-  const db = await getDb(event);
   await db.insert(attempt).values({ gameId, word, result: result.join("") });
 
   return wordleGame.state;

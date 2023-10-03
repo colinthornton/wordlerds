@@ -7,12 +7,14 @@
     "dev": "nuxt dev",
     "db:generate": "drizzle-kit generate:sqlite",
     "db:push": "drizzle-kit push:sqlite",
+    "db:migrate": "tsx src/server/db/migrate.ts",
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
     "drizzle-kit": "^0.19.13",
-    "nuxt": "^3.7.3"
+    "nuxt": "^3.7.4",
+    "tsx": "^3.13.0"
   },
   "dependencies": {
     "@libsql/client": "^0.3.5",

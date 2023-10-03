@@ -1,11 +1,9 @@
 import { eq } from "drizzle-orm";
-import { H3Event } from "h3";
 import { CharResult } from "~/types/CharResult";
-import { getDb, game } from "../db";
+import { game, type WordlerdDB } from "../db";
 import { WordleGame } from "./WordleGame";
 
-export async function getWordleGame(event: H3Event): Promise<WordleGame> {
-  const db = await getDb(event);
+export async function getWordleGame(db: WordlerdDB): Promise<WordleGame> {
   const today = new Date().toISOString().slice(0, 10);
   const currentGame = await db.query.game.findFirst({
     columns: { id: true, solution: true },

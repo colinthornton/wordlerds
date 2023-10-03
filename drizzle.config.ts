@@ -2,7 +2,7 @@ import type { Config } from "drizzle-kit";
 
 export default {
   schema: "./src/server/db/schema.ts",
-  out: "./migrations",
+  out: "./src/server/db/migrations",
   driver: "turso",
   dbCredentials: {
     url: "file:local.db",

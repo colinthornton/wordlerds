@@ -1,11 +1,7 @@
-import { game, getDb } from "~/server/db";
+import { type WordlerdDB, game } from "~/server/db";
 import { targets } from "~/assets/targets";
-import { H3Event } from "h3";
 
-export async function seedGames(event: H3Event) {
-  const db = await getDb(event);
-  await db.delete(game);
-
+export async function seedGames(db: WordlerdDB) {
   const shuffledSolutions = shuffle(targets);
   const date = new Date();
   const games = shuffledSolutions.map((solution) => {
