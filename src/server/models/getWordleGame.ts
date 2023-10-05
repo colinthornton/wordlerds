@@ -2,9 +2,10 @@ import { eq } from "drizzle-orm";
 import { CharResult } from "~/types/CharResult";
 import { game, type WordlerdDB } from "../db";
 import { WordleGame } from "./WordleGame";
+import { getDateString } from "~/utils/getDateString";
 
 export async function getWordleGame(db: WordlerdDB): Promise<WordleGame> {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getDateString();
   const currentGame = await db.query.game.findFirst({
     columns: { id: true, solution: true },
     where: eq(game.date, today),

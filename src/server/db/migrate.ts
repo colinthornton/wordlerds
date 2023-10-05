@@ -4,6 +4,7 @@ import { drizzle } from "drizzle-orm/libsql";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import * as schema from "./schema";
 import { seedGames } from "./seeds/games";
+import { getDateString } from "~/utils/getDateString";
 
 runMigrations();
 
@@ -22,7 +23,7 @@ async function runMigrations() {
 
   const currentGame = await db.query.game.findFirst({
     columns: { id: true },
-    where: eq(schema.game.date, new Date().toISOString().slice(10)),
+    where: eq(schema.game.date, getDateString()),
   });
   if (!currentGame) {
     await seedGames(db);

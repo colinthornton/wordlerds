@@ -1,5 +1,6 @@
 import { type WordlerdDB, game } from "~/server/db";
 import { targets } from "~/assets/targets";
+import { getDateString } from "~/utils/getDateString";
 
 export async function seedGames(db: WordlerdDB) {
   const shuffledSolutions = shuffle(targets);
@@ -7,7 +8,7 @@ export async function seedGames(db: WordlerdDB) {
   const games = shuffledSolutions.map((solution) => {
     const game = {
       solution,
-      date: date.toISOString().slice(0, 10),
+      date: getDateString(date),
     };
     date.setDate(date.getDate() + 1);
     return game;
