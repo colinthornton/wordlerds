@@ -1,4 +1,17 @@
 export default defineNuxtConfig({
+  app: {
+    head: {
+      script: [
+        {
+          defer: true,
+          src: "https://static.cloudflareinsights.com/beacon.min.js",
+          "data-cf-beacon": JSON.stringify({
+            token: process.env.CLOUDFLARE_INSIGHTS_TOKEN,
+          }),
+        },
+      ],
+    },
+  },
   devtools: { enabled: false },
   runtimeConfig: {
     databaseUrl: "file:./src/server/db/local.db",
