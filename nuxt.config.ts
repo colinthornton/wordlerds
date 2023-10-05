@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     },
   },
   devtools: { enabled: false },
+  modules: ["@sidebase/nuxt-auth"],
   runtimeConfig: {
     databaseUrl: "file:./src/server/db/local.db",
     databaseAuthToken: "",

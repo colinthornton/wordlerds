@@ -1,16 +1,11 @@
 import { relations } from "drizzle-orm";
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 
-// export const user = sqliteTable("user", {
-//   id: integer("id").primaryKey(),
-//   username: text("username").notNull().unique(),
-//   createdAt: integer("created_at", { mode: "timestamp" })
-//     .notNull()
-//     .$defaultFn(() => new Date()),
-//   updatedAt: integer("updated_at", { mode: "timestamp" })
-//     .notNull()
-//     .$defaultFn(() => new Date()),
-// });
+export const user = sqliteTable("user", {
+  id: integer("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  avatar: text("avatar"),
+});
 
 export const game = sqliteTable("game", {
   id: integer("id").primaryKey(),
@@ -29,9 +24,9 @@ export const attempt = sqliteTable("attempt", {
   gameId: integer("game_id")
     .notNull()
     .references(() => game.id),
-  // userId: integer("user_id")
-  //   .notNull()
-  //   .references(() => user.id),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => user.id),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
     .$defaultFn(() => new Date()),
@@ -41,5 +36,9 @@ export const attemptRelations = relations(attempt, ({ one }) => ({
   game: one(game, {
     fields: [attempt.gameId],
     references: [game.id],
+  }),
+  user: one(user, {
+    fields: [attempt.userId],
+    references: [user.id],
   }),
 }));

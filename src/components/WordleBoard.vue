@@ -1,17 +1,28 @@
 <script setup lang="ts">
-defineProps<{
-  words: string[][];
-  results: CharResult[][];
+import type { CharResult } from "~/types/CharResult";
+
+const props = defineProps<{
+  attempts: {
+    word: string;
+    result: CharResult[];
+  }[];
 }>();
+
+const board = computed(() => {
+  return Array.from({ length: 6 }).map(
+    (_, i) => props.attempts[i] ?? { word: "     ", result: [] }
+  );
+});
+console.log(JSON.stringify(board.value.length));
 </script>
 
 <template>
   <div class="board">
-    <div v-for="(word, i) in words" class="word">
+    <div v-for="row in board" class="word">
       <div
-        v-for="(char, j) in word"
+        v-for="(char, i) in row.word.split('')"
         class="char"
-        :class="[results[i] ? `result-${results[i][j]}` : '']"
+        :class="`result-${row.result[i]}`"
       >
         {{ char }}
       </div>
@@ -21,7 +32,8 @@ defineProps<{
 
 <style scoped>
 .board {
-  width: 350px;
+  width: 100%;
+  max-width: 350px;
   height: 420px;
   display: grid;
   gap: 5px;

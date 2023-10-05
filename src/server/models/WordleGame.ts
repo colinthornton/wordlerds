@@ -7,8 +7,14 @@ import {
 import { dictionary } from "~/assets/dictionary";
 
 export class WordleGame {
-  private attempts: string[] = [];
-  private results: CharResult[][] = [];
+  private attempts: {
+    word: string;
+    result: CharResult[];
+    user: {
+      username: string;
+      avatar: string | null;
+    };
+  }[] = [];
   private status: "PLAYING" | "GAME_OVER" = "PLAYING";
 
   get id() {
@@ -18,7 +24,6 @@ export class WordleGame {
   get state(): WordleGameState {
     return {
       attempts: this.attempts,
-      results: this.results,
       keys: this.keys,
       status: this.status,
     };
@@ -26,10 +31,10 @@ export class WordleGame {
 
   get keys() {
     const keys = new Map<string, CharResult>();
-    this.attempts.forEach((attempt, i) => {
-      attempt.split("").forEach((char, j) => {
+    this.attempts.forEach((attempt) => {
+      attempt.word.split("").forEach((char, j) => {
         const current = keys.get(char) ?? RESULT_NOT_FOUND;
-        keys.set(char, Math.max(current, this.results[i][j]) as CharResult);
+        keys.set(char, Math.max(current, attempt.result[j]) as CharResult);
       });
     });
     return Object.fromEntries(keys);
@@ -38,13 +43,31 @@ export class WordleGame {
   constructor(
     private _id: number,
     private solution: string,
-    attempts: string[],
-    results: CharResult[][]
+    attempts: {
+      word: string;
+      result: string;
+      user: {
+        username: string;
+        avatar: string | null;
+      };
+    }[]
   ) {
-    attempts.forEach((word, i) => this.attempt(word, i, results[i]));
+    attempts.forEach((attempt, i) =>
+      this.attempt(
+        attempt.word,
+        i,
+        attempt.user,
+        attempt.result.split("").map(Number) as CharResult[]
+      )
+    );
   }
 
-  attempt(word: string, wordIndex: number, result?: CharResult[]) {
+  attempt(
+    word: string,
+    wordIndex: number,
+    user: { username: string; avatar: string | null },
+    result?: CharResult[]
+  ) {
     if (wordIndex !== this.attempts.length) {
       throw new WordleGameDesyncError();
     }
@@ -53,11 +76,10 @@ export class WordleGame {
       throw new WordleInvalidWordError();
     }
 
-    this.attempts.push(word);
     if (!result) {
       result = this.getResult(word.split(""));
     }
-    this.results.push(result);
+    this.attempts.push({ word, user, result });
 
     if (result.every((r) => r === RESULT_CORRECT)) {
       this.status = "GAME_OVER";
@@ -100,8 +122,14 @@ export class WordleInvalidWordError extends Error {}
 export class WordleGameDesyncError extends Error {}
 
 export type WordleGameState = {
-  attempts: string[];
-  results: CharResult[][];
+  attempts: {
+    word: string;
+    user: {
+      username: string;
+      avatar: string | null;
+    };
+    result: CharResult[];
+  }[];
   keys: Record<string, CharResult>;
   status: "PLAYING" | "GAME_OVER";
 };

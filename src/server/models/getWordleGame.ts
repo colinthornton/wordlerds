@@ -9,16 +9,18 @@ export async function getWordleGame(db: WordlerdDB): Promise<WordleGame> {
   const currentGame = await db.query.game.findFirst({
     columns: { id: true, solution: true },
     where: eq(game.date, today),
-    with: { attempts: { columns: { word: true, result: true } } },
+    with: {
+      attempts: {
+        columns: { word: true, result: true },
+        with: {
+          user: { columns: { username: true, avatar: true } },
+        },
+      },
+    },
   });
   if (!currentGame) {
     throw createError({ status: 500 });
   }
   const { id, solution, attempts } = currentGame;
-  return new WordleGame(
-    id,
-    solution,
-    attempts.map(({ word }) => word),
-    attempts.map(({ result }) => result.split("").map(Number) as CharResult[])
-  );
+  return new WordleGame(id, solution, attempts);
 }

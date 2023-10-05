@@ -1,75 +1,67 @@
 <script setup lang="ts">
 const { data: state, error } = await useFetch("/api/game");
-if (error.value) {
-  throw createError(error.value);
+if (!state.value) {
+  throw error.value;
 }
 
-const MAX_WORDS = 6;
 const MAX_CHARS = 5;
 
-const words = useState("WordleGame-words", (): string[][] =>
-  Array.from(
-    { length: MAX_WORDS },
-    (_, i) =>
-      state.value?.attempts[i] ??
-      Array.from(
-        { length: MAX_CHARS },
-        (_, j) => state.value?.attempts[i]?.[j] ?? ""
-      )
-  )
-);
-let wordIndex = state.value?.attempts.length ?? 0;
+if (state.value.status === "PLAYING") {
+  state.value.attempts.push({
+    word: "     ",
+    result: [],
+    user: {
+      username: "",
+      avatar: "",
+    },
+  });
+}
+const attemptIndex = state.value.attempts.length;
 let charIndex = 0;
+const currentAttempt = computed(() => {
+  if (!state.value) throw new Error();
+  console.log(state.value.attempts);
+  return state.value.attempts[attemptIndex];
+});
 
-let resultPending = false;
-const results = useState(
-  "WordleGame-results",
-  (): CharResult[][] => state.value?.results ?? []
-);
-
-const keys = useState("WordleGame-keys", () => state.value?.keys ?? {});
+let attemptPending = false;
 
 async function handlePress(key: string) {
-  if (wordIndex === MAX_WORDS) return;
-  if (resultPending) return;
+  if (!state.value) return;
+  if (state.value.status === "GAME_OVER") return;
+  if (attemptPending) return;
 
   switch (key) {
     case "enter":
       if (charIndex !== MAX_CHARS) return;
-      const state = await sendAttempt();
-      if (!state) {
+      const newState = await sendAttempt();
+      if (!newState) {
         throw createError(new Error("Something went wrong"));
       }
-      results.value = state.results;
-      keys.value = state.keys;
-      wordIndex++;
-      charIndex = 0;
-      if (state.status === "GAME_OVER") {
-        setTimeout(reloadNuxtApp, 1000);
-      }
+      state.value = newState;
       break;
     case "backspace":
       if (charIndex === 0) return;
       charIndex--;
-      words.value[wordIndex][charIndex] = "";
+      currentAttempt.value.word = currentAttempt.value.word.slice(0, charIndex);
       break;
     default:
       if (charIndex === MAX_CHARS) return;
-      words.value[wordIndex][charIndex] = key;
+      currentAttempt.value.word = currentAttempt.value.word + key;
       charIndex++;
   }
 }
 
 function sendAttempt() {
-  resultPending = true;
+  attemptPending = true;
   return $fetch("/api/attempt", {
     method: "POST",
     body: {
-      word: words.value[wordIndex],
-      wordIndex,
+      word: currentAttempt.value.word,
+      attemptIndex,
     },
     onResponse() {
-      resultPending = false;
+      attemptPending = false;
     },
     onResponseError() {
       reloadNuxtApp();
@@ -80,8 +72,8 @@ function sendAttempt() {
 
 <template>
   <main>
-    <WordleBoard :words="words" :results="results" />
-    <WordleKeyboard :key-mods="keys" @press="handlePress" />
+    <WordleBoard :attempts="state?.attempts ?? []" />
+    <WordleKeyboard :keys="state?.keys ?? {}" @press="handlePress" />
   </main>
 </template>
 
@@ -90,6 +82,7 @@ main {
   display: grid;
   place-items: center;
   grid-template-rows: 1fr auto;
-  min-height: 100dvh;
+  gap: 1em;
+  padding: 1em;
 }
 </style>

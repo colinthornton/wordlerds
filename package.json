@@ -8,10 +8,12 @@
     "db:generate": "drizzle-kit generate:sqlite",
     "db:push": "drizzle-kit push:sqlite",
     "db:migrate": "tsx src/server/db/migrate.ts",
+    "db:seed": "tsx src/server/db/seeds/index.ts",
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
+    "@sidebase/nuxt-auth": "^0.5.0",
     "better-sqlite3": "^8.7.0",
     "drizzle-kit": "^0.19.13",
     "nuxt": "^3.7.4",
@@ -20,6 +22,7 @@
   "dependencies": {
     "@libsql/client": "^0.3.5",
     "drizzle-orm": "^0.28.6",
+    "next-auth": "4.21.1",
     "zod": "^3.22.2"
   }
 }

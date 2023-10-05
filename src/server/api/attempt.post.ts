@@ -1,10 +1,43 @@
 import { z } from "zod";
+import { getServerSession } from "#auth";
 import { getWordleGame } from "../models/getWordleGame";
-import { getDb, attempt } from "../db";
+import { getDb, user, attempt } from "../db";
 import { WordleGameState } from "../models/WordleGame";
 import { CharResult } from "~/types/CharResult";
+import { eq, and, ne } from "drizzle-orm";
 
 export default defineEventHandler(async (event): Promise<WordleGameState> => {
+  // authenticate
+  const session = await getServerSession(event);
+  const username = session?.user?.name;
+  const avatar = session?.user?.image;
+  if (typeof username !== "string" || !username.length) {
+    throw createError({ status: 401 });
+  }
+  const db = getDb(event);
+  const authUser = await db
+    .insert(user)
+    .values({ username, avatar })
+    .onConflictDoUpdate({
+      target: user.username,
+      set: { avatar },
+    })
+    .returning()
+    .get();
+
+  // prevent multiple attempts
+  const wordleGame = await getWordleGame(db);
+  const currentGameAttempt = await db.query.attempt.findFirst({
+    columns: { id: true },
+    where: and(
+      eq(attempt.gameId, wordleGame.id),
+      eq(attempt.userId, authUser.id)
+    ),
+  });
+  if (currentGameAttempt) {
+    throw createError({ status: 403 });
+  }
+
   // validate input
   const validation = z
     .object({
@@ -18,11 +51,9 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
   const body = validation.data;
 
   // update game state
-  const db = getDb(event);
-  const wordleGame = await getWordleGame(db);
   let result: CharResult[];
   try {
-    result = wordleGame.attempt(body.word.join(""), body.wordIndex);
+    result = wordleGame.attempt(body.word.join(""), body.wordIndex, authUser);
   } catch (error) {
     throw createError({ statusCode: 400 });
   }
@@ -30,7 +61,9 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
   // save attempt
   const gameId = wordleGame.id;
   const word = body.word.join("");
-  await db.insert(attempt).values({ gameId, word, result: result.join("") });
+  await db
+    .insert(attempt)
+    .values({ gameId, userId: authUser.id, word, result: result.join("") });
 
   return wordleGame.state;
 });
