@@ -1,7 +1,5 @@
 import { resolve } from "node:path";
 
-console.log("CF_PAGES_URL", process.env.CF_PAGES_URL);
-
 export default defineNuxtConfig({
   alias: {
     cookie: resolve(__dirname, "node_modules/cookie"),
@@ -35,7 +33,7 @@ export default defineNuxtConfig({
     playerIds: process.env.NUXT_PLAYER_IDS,
     public: {
       authJs: {
-        baseUrl: process.env.CF_PAGES_URL,
+        baseUrl: process.env.NUXT_PUBLIC_AUTH_JS_BASE_URL,
       },
     },
   },
