@@ -2,7 +2,7 @@ import { authOptions } from "~/server/api/auth/[...]";
 import { getServerSession } from "#auth";
 import { z } from "zod";
 import { getCoopDailyGame } from "~/server/models/getCoopDailyGame";
-import { db, coopMugenAttempt } from "~/server/db";
+import { db, coopDailyAttempt } from "~/server/db";
 import { WordleGameState } from "~/server/models/WordleGame";
 import { CharResult } from "~/types/CharResult";
 import { eq, and } from "drizzle-orm";
@@ -28,11 +28,11 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
 
   // prevent multiple attempts
   const { data, wordleGame } = await getCoopDailyGame(db);
-  const currentGameAttempt = await db.query.coopMugenAttempt.findFirst({
+  const currentGameAttempt = await db.query.coopDailyAttempt.findFirst({
     columns: { id: true },
     where: and(
-      eq(coopMugenAttempt.gameId, data.id),
-      eq(coopMugenAttempt.userId, session.user.id)
+      eq(coopDailyAttempt.gameId, data.id),
+      eq(coopDailyAttempt.userId, session.user.id)
     ),
   });
   if (currentGameAttempt) {
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
 
   // save attempt
   const word = body.word;
-  await db.insert(coopMugenAttempt).values({
+  await db.insert(coopDailyAttempt).values({
     gameId: data.id,
     userId: session.user.id,
     word,

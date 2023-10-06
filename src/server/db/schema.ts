@@ -22,7 +22,7 @@ export const coopDailyAttempt = sqliteTable("coop_daily_attempt", {
   id: integer("id").primaryKey(),
   word: text("word", { length: 5 }).notNull(),
   result: text("result", { length: 5 }).notNull(),
-  gameId: integer("gamd_id")
+  gameId: integer("game_id")
     .notNull()
     .references(() => coopDailyGame.id),
   userId: integer("user_id")
