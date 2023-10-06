@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "ab1654f6-36ef-4e06-85ff-9a48ecc7cbcc",
+  "id": "51478d54-2553-4cf7-b11f-1a2dcd1123cd",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "attempt": {
@@ -35,6 +35,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "integer",
@@ -51,6 +58,19 @@
           "tableTo": "game",
           "columnsFrom": [
             "game_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "attempt_user_id_user_id_fk": {
+          "name": "attempt_user_id_user_id_fk",
+          "tableFrom": "attempt",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -92,6 +112,51 @@
           "name": "game_date_unique",
           "columns": [
             "date"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "user": {
+      "name": "user",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "discord_id": {
+          "name": "discord_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "avatar": {
+          "name": "avatar",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "user_discord_id_unique": {
+          "name": "user_discord_id_unique",
+          "columns": [
+            "discord_id"
           ],
           "isUnique": true
         }
