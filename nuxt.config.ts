@@ -1,4 +1,9 @@
+import { resolve } from "node:path";
+
 export default defineNuxtConfig({
+  alias: {
+    cookie: resolve(__dirname, "node_modules/cookie"),
+  },
   app: {
     head: {
       script: [
@@ -12,18 +17,25 @@ export default defineNuxtConfig({
       ],
     },
   },
-  auth: {
-    origin: process.env.CF_PAGES_URL ?? "https://wordlerds.pages.dev",
-  },
   devtools: { enabled: false },
-  modules: ["@sidebase/nuxt-auth"],
+  modules: ["@hebilicious/authjs-nuxt"],
   runtimeConfig: {
-    databaseUrl: "file:./src/server/db/local.db",
-    databaseAuthToken: undefined,
-    authSecret: "secret",
-    discordClientId: undefined,
-    discordClientSecret: undefined,
-    playerIds: undefined,
+    databaseUrl:
+      process.env.NUXT_DATABASE_URL ?? "file:./src/server/db/local.db",
+    databaseAuthToken: process.env.NUXT_DATABASE_AUTH_TOKEN,
+    authJs: {
+      secret: process.env.NUXT_AUTH_JS_SECRET,
+    },
+    discord: {
+      clientId: process.env.NUXT_DISCORD_CLIENT_ID,
+      clientSecret: process.env.NUXT_DISCORD_CLIENT_SECRET,
+    },
+    playerIds: process.env.NUXT_PLAYER_IDS,
+    public: {
+      authJs: {
+        baseUrl: process.env.CF_PAGES_URL,
+      },
+    },
   },
   srcDir: "src",
 });

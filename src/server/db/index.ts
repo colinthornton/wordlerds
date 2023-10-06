@@ -1,26 +1,17 @@
 import { createClient } from "@libsql/client";
-import { LibSQLDatabase, drizzle } from "drizzle-orm/libsql";
-import { H3Event } from "h3";
+import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "./schema";
 
-export type WordlerdDB = LibSQLDatabase<typeof schema>;
+const { databaseUrl, databaseAuthToken } = useRuntimeConfig();
 
-let db: WordlerdDB;
+const client = createClient({
+  url: databaseUrl,
+  authToken: databaseAuthToken,
+});
 
-export function getDb(event: H3Event) {
-  if (!db) {
-    const client = createClient({
-      url: useRuntimeConfig(event).databaseUrl,
-      authToken: useRuntimeConfig(event).databaseAuthToken,
-    });
-
-    db = drizzle(client, {
-      schema,
-      logger: process.env.NODE_ENV === "development",
-    });
-  }
-
-  return db;
-}
+export const db = drizzle(client, {
+  schema,
+  logger: process.env.NODE_ENV === "development",
+});
 
 export * from "./schema";

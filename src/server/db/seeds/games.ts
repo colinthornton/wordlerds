@@ -1,8 +1,9 @@
-import { type WordlerdDB, game } from "~/server/db";
+import * as schema from "~/server/db/schema";
 import { targets } from "~/assets/targets";
 import { getDateString } from "~/utils/getDateString";
+import { LibSQLDatabase } from "drizzle-orm/libsql";
 
-export async function seedGames(db: WordlerdDB) {
+export async function seedGames(db: LibSQLDatabase<typeof schema>) {
   const shuffledSolutions = shuffle(targets);
   const date = new Date();
   const games = shuffledSolutions.map((solution) => {
@@ -13,7 +14,7 @@ export async function seedGames(db: WordlerdDB) {
     date.setDate(date.getDate() + 1);
     return game;
   });
-  const rows = await db.insert(game).values(games).returning();
+  const rows = await db.insert(schema.game).values(games).returning();
   rows.forEach((row) => console.log(row));
 }
 

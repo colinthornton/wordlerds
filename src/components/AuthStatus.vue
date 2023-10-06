@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { signIn, signOut, data, status } = useAuth();
+const { signIn, signOut, status, session } = useAuth();
 </script>
 
 <template>
@@ -7,8 +7,13 @@ const { signIn, signOut, data, status } = useAuth();
     <div class="auth-status">
       <template v-if="status === 'authenticated'">
         <button @click="signOut()">Sign Out</button>
-        <img class="image" :src="data?.user?.avatar" width="128" height="128" />
-        <span>{{ data?.user?.name }}</span>
+        <img
+          class="image"
+          :src="session?.user?.avatar"
+          width="128"
+          height="128"
+        />
+        <span>{{ session?.user?.name }}</span>
       </template>
       <button
         v-else-if="status === 'unauthenticated'"

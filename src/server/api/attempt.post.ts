@@ -1,7 +1,8 @@
-import { z } from "zod";
+import { authOptions } from "./auth/[...]";
 import { getServerSession } from "#auth";
+import { z } from "zod";
 import { getWordleGame } from "../models/getWordleGame";
-import { getDb, attempt } from "../db";
+import { db, attempt } from "../db";
 import { WordleGameState } from "../models/WordleGame";
 import { CharResult } from "~/types/CharResult";
 import { eq, and } from "drizzle-orm";
@@ -20,13 +21,12 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
   const body = validation.data;
 
   // authenticate
-  const session = await getServerSession(event);
+  const session = await getServerSession(event, authOptions);
   if (!session?.user) {
     throw createError({ status: 401 });
   }
 
   // prevent multiple attempts
-  const db = getDb(event);
   const wordleGame = await getWordleGame(db);
   const currentGameAttempt = await db.query.attempt.findFirst({
     columns: { id: true },

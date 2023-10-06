@@ -1,89 +1,80 @@
+import DiscordProvider from "@auth/core/providers/discord";
+import type { AuthConfig } from "@auth/core/types";
 import { NuxtAuthHandler } from "#auth";
-import DiscordProvider from "next-auth/providers/discord";
 import { z } from "zod";
-import { getDb, user as userTable } from "~/server/db";
+import { db, user as userTable } from "~/server/db";
 
-let nuxtAuthHandler: ReturnType<typeof NuxtAuthHandler>;
+const runtimeConfig = useRuntimeConfig();
 
-export default defineEventHandler((event) => {
-  if (!nuxtAuthHandler) {
-    const db = getDb(event);
-    const { authSecret, discordClientId, discordClientSecret, playerIds } =
-      useRuntimeConfig(event);
+export const authOptions: AuthConfig = {
+  secret: runtimeConfig.authJs.secret,
+  providers: [
+    DiscordProvider({
+      clientId: runtimeConfig.discord.clientId,
+      clientSecret: runtimeConfig.discord.clientSecret,
+      authorization: "https://discord.com/api/oauth2/authorize?scope=identify", // don't need email
+    }),
+  ],
+  callbacks: {
+    signIn({ profile }) {
+      return runtimeConfig.playerIds.split(",").includes(profile?.id as string);
+    },
+    async jwt({ trigger, token, user, profile }) {
+      console.log("jwt");
+      console.log({ trigger, token, user, profile });
+      if (trigger === "signIn") {
+        // https://discord.com/developers/docs/resources/user#user-object
+        const discordProfile = z
+          .object({
+            id: z.string(),
+            username: z.string(),
+            global_name: z.string().optional(),
+          })
+          .parse(profile);
+        const defaultUser = z
+          .object({
+            image: z.string(),
+          })
+          .parse(user);
 
-    nuxtAuthHandler = NuxtAuthHandler({
-      debug: process.env.NODE_ENV === "development",
-      secret: authSecret,
-      providers: [
-        // @ts-expect-error "You need to use .default here for it to work during SSR. May be fixed via Vite at some point" - https://sidebase.io/nuxt-auth/getting-started/quick-start
-        (DiscordProvider.default as typeof DiscordProvider)({
-          clientId: discordClientId,
-          clientSecret: discordClientSecret,
-          authorization:
-            "https://discord.com/api/oauth2/authorize?scope=identify", // don't need email
-        }),
-      ],
-      callbacks: {
-        signIn({ user }) {
-          return playerIds.split(",").includes(user.id);
-        },
-        async jwt({ trigger, token, user, profile }) {
-          if (trigger === "signIn") {
-            // https://discord.com/developers/docs/resources/user#user-object
-            const discordProfile = z
-              .object({
-                id: z.string(),
-                username: z.string(),
-                global_name: z.string().optional(),
-              })
-              .parse(profile);
-            const defaultUser = z
-              .object({
-                image: z.string(),
-              })
-              .parse(user);
+        const value = {
+          discord_id: discordProfile.id,
+          name: discordProfile.global_name ?? discordProfile.username,
+          avatar: defaultUser.image,
+        };
+        const dbUser = await db
+          .insert(userTable)
+          .values(value)
+          .onConflictDoUpdate({
+            target: userTable.discord_id,
+            set: { name: value.name, avatar: value.avatar },
+          })
+          .returning()
+          .get();
+        Object.assign(token, dbUser);
+      }
+      return token;
+    },
+    session({ token, session }) {
+      console.log("session");
+      console.log({ token, session });
+      const user = z
+        .object({
+          id: z.number(),
+          discord_id: z.string(),
+          name: z.string(),
+          avatar: z.string(),
+        })
+        .parse(token);
+      session.user = user;
+      return session;
+    },
+  },
+};
 
-            const value = {
-              discord_id: discordProfile.id,
-              name: discordProfile.global_name ?? discordProfile.username,
-              avatar: defaultUser.image,
-            };
-            const dbUser = await db
-              .insert(userTable)
-              .values(value)
-              .onConflictDoUpdate({
-                target: userTable.discord_id,
-                set: { name: value.name, avatar: value.avatar },
-              })
-              .returning()
-              .get();
-            Object.assign(token, dbUser);
-          }
-          return token;
-        },
-        session({ token, session }) {
-          const user = z
-            .object({
-              id: z.number(),
-              discord_id: z.string(),
-              name: z.string(),
-              avatar: z.string(),
-            })
-            .parse(token);
-          session.user = user;
-          return session;
-        },
-      },
-    });
-  }
+export default NuxtAuthHandler(authOptions, runtimeConfig);
 
-  return nuxtAuthHandler(event);
-});
-
-declare module "next-auth" {
-  /**
-   * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
-   */
+declare module "@auth/core/types" {
   interface Session {
     user?: typeof userTable.$inferSelect;
   }
