@@ -12,8 +12,11 @@ export default defineNuxtConfig({
       ],
     },
   },
+  auth: {
+    origin: process.env.CF_PAGES_URL ?? "https://wordlerds.pages.dev",
+  },
   devtools: { enabled: false },
-  modules: [["@sidebase/nuxt-auth", { origin: process.env.CF_PAGES_URL }]],
+  modules: ["@sidebase/nuxt-auth"],
   runtimeConfig: {
     databaseUrl: "file:./src/server/db/local.db",
     databaseAuthToken: undefined,
