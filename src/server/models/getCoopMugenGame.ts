@@ -1,5 +1,5 @@
 import { asc, desc } from "drizzle-orm";
-import { attempt, coopMugenGame, type WordlerdsDB } from "../db";
+import { coopMugenAttempt, coopMugenGame, type WordlerdsDB } from "../db";
 import { WordleGame } from "./WordleGame";
 import { createCoopMugenGame } from "./createCoopMugenGame";
 
@@ -12,7 +12,7 @@ export async function getCoopMugenGame(db: WordlerdsDB) {
         with: {
           user: { columns: { id: true, name: true, avatar: true } },
         },
-        orderBy: [asc(attempt.createdAt)],
+        orderBy: [asc(coopMugenAttempt.createdAt)],
       },
     },
     orderBy: [desc(coopMugenGame.id)],

@@ -1,5 +1,5 @@
 import { asc, eq } from "drizzle-orm";
-import { coopDailyGame, attempt, type WordlerdsDB } from "../db";
+import { coopDailyGame, coopDailyAttempt, type WordlerdsDB } from "../db";
 import { WordleGame } from "./WordleGame";
 import { getDateString } from "~/utils/getDateString";
 
@@ -14,7 +14,7 @@ export async function getCoopDailyGame(db: WordlerdsDB) {
         with: {
           user: { columns: { id: true, name: true, avatar: true } },
         },
-        orderBy: [asc(attempt.createdAt)],
+        orderBy: [asc(coopDailyAttempt.createdAt)],
       },
     },
   });

@@ -15,8 +15,37 @@ export const coopDailyGame = sqliteTable("coop_daily_game", {
 });
 
 export const coopDailyGameRelations = relations(coopDailyGame, ({ many }) => ({
-  attempts: many(attempt),
+  attempts: many(coopDailyAttempt),
 }));
+
+export const coopDailyAttempt = sqliteTable("coop_daily_attempt", {
+  id: integer("id").primaryKey(),
+  word: text("word", { length: 5 }).notNull(),
+  result: text("result", { length: 5 }).notNull(),
+  gameId: integer("gamd_id")
+    .notNull()
+    .references(() => coopDailyGame.id),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => user.id),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
+export const coopDailyAttemptRelations = relations(
+  coopDailyAttempt,
+  ({ one }) => ({
+    coopDailyGame: one(coopDailyGame, {
+      fields: [coopDailyAttempt.gameId],
+      references: [coopDailyGame.id],
+    }),
+    user: one(user, {
+      fields: [coopDailyAttempt.userId],
+      references: [user.id],
+    }),
+  })
+);
 
 export const coopMugenGame = sqliteTable("coop_mugen_game", {
   id: integer("id").primaryKey(),
@@ -27,19 +56,16 @@ export const coopMugenGame = sqliteTable("coop_mugen_game", {
 });
 
 export const coopMugenGameRelations = relations(coopMugenGame, ({ many }) => ({
-  attempts: many(attempt),
+  attempts: many(coopMugenAttempt),
 }));
 
-export const attempt = sqliteTable("attempt", {
+export const coopMugenAttempt = sqliteTable("coop_mugen_attempt", {
   id: integer("id").primaryKey(),
   word: text("word", { length: 5 }).notNull(),
   result: text("result", { length: 5 }).notNull(),
-  coopDailyGameId: integer("coop_daily_game_id").references(
-    () => coopDailyGame.id
-  ),
-  coopMugenGameId: integer("coop_mugen_game_id").references(
-    () => coopMugenGame.id
-  ),
+  gameId: integer("gamd_id")
+    .notNull()
+    .references(() => coopMugenGame.id),
   userId: integer("user_id")
     .notNull()
     .references(() => user.id),
@@ -48,17 +74,16 @@ export const attempt = sqliteTable("attempt", {
     .$defaultFn(() => new Date()),
 });
 
-export const attemptRelations = relations(attempt, ({ one }) => ({
-  coopDailyGame: one(coopDailyGame, {
-    fields: [attempt.coopDailyGameId],
-    references: [coopDailyGame.id],
-  }),
-  coopMugenGame: one(coopMugenGame, {
-    fields: [attempt.coopMugenGameId],
-    references: [coopMugenGame.id],
-  }),
-  user: one(user, {
-    fields: [attempt.userId],
-    references: [user.id],
-  }),
-}));
+export const coopMugenAttemptRelations = relations(
+  coopMugenAttempt,
+  ({ one }) => ({
+    coopDailyGame: one(coopMugenGame, {
+      fields: [coopMugenAttempt.gameId],
+      references: [coopMugenGame.id],
+    }),
+    user: one(user, {
+      fields: [coopMugenAttempt.userId],
+      references: [user.id],
+    }),
+  })
+);

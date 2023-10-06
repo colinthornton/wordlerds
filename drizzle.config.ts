@@ -5,7 +5,8 @@ export default {
   out: "./src/server/db/migrations",
   driver: "turso",
   dbCredentials: {
-    url: "file:./src/server/db/local.db",
+    url: process.env.NUXT_DATABASE_URL ?? "file:./src/server/db/local.db",
+    authToken: process.env.NUXT_DATABASE_AUTH_TOKEN,
   },
   breakpoints: true,
   verbose: true,
