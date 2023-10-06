@@ -1,5 +1,7 @@
 import { resolve } from "node:path";
 
+console.log("CF_PAGES_URL", process.env.CF_PAGES_URL);
+
 export default defineNuxtConfig({
   alias: {
     cookie: resolve(__dirname, "node_modules/cookie"),
