@@ -19,7 +19,11 @@ async function runMigrations() {
     schema,
   });
 
-  await migrate(db, { migrationsFolder: "./src/server/db/migrations" });
+  try {
+    await migrate(db, { migrationsFolder: "./src/server/db/migrations" });
+  } catch (error) {
+    console.error(error);
+  }
 
   const currentCoopDailyGame = await db.query.coopDailyGame.findFirst({
     columns: { id: true },
