@@ -34,7 +34,7 @@ async function sendAttempt(word: string) {
 </script>
 
 <template>
-  <h1>Co-op Daily</h1>
+  <h1>Co-op Mugen</h1>
   <WordleGame
     v-if="data"
     :state="data.state"
