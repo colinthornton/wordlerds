@@ -1,5 +1,4 @@
 import { eq } from "drizzle-orm";
-import { CharResult } from "~/types/CharResult";
 import { game, type WordlerdDB } from "../db";
 import { WordleGame } from "./WordleGame";
 import { getDateString } from "~/utils/getDateString";
@@ -13,7 +12,7 @@ export async function getWordleGame(db: WordlerdDB): Promise<WordleGame> {
       attempts: {
         columns: { word: true, result: true },
         with: {
-          user: { columns: { username: true, avatar: true } },
+          user: { columns: { name: true, avatar: true } },
         },
       },
     },
