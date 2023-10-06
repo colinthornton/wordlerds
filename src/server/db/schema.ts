@@ -2,7 +2,8 @@ import { relations } from "drizzle-orm";
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 
 export const user = sqliteTable("user", {
-  id: text("id").primaryKey(),
+  id: integer("id").primaryKey(),
+  discord_id: text("discord_id").notNull().unique(),
   name: text("name").notNull(),
   avatar: text("avatar").notNull(),
 });

@@ -5,27 +5,10 @@ if (!state.value) {
 }
 
 const MAX_CHARS = 5;
-
-if (state.value.status === "PLAYING") {
-  state.value.attempts.push({
-    word: "     ",
-    result: [],
-    user: {
-      username: "",
-      avatar: "",
-    },
-  });
-}
-const attemptIndex = state.value.attempts.length;
+const currentWord = ref(new Array(MAX_CHARS).fill("")) as Ref<string[]>;
 let charIndex = 0;
-const currentAttempt = computed(() => {
-  if (!state.value) throw new Error();
-  console.log(state.value.attempts);
-  return state.value.attempts[attemptIndex];
-});
 
 let attemptPending = false;
-
 async function handlePress(key: string) {
   if (!state.value) return;
   if (state.value.status === "GAME_OVER") return;
@@ -39,15 +22,17 @@ async function handlePress(key: string) {
         throw createError(new Error("Something went wrong"));
       }
       state.value = newState;
+      currentWord.value = new Array(MAX_CHARS).fill("");
+      charIndex = 0;
       break;
     case "backspace":
       if (charIndex === 0) return;
       charIndex--;
-      currentAttempt.value.word = currentAttempt.value.word.slice(0, charIndex);
+      currentWord.value[charIndex] = "";
       break;
     default:
       if (charIndex === MAX_CHARS) return;
-      currentAttempt.value.word = currentAttempt.value.word + key;
+      currentWord.value[charIndex] = key;
       charIndex++;
   }
 }
@@ -57,8 +42,8 @@ function sendAttempt() {
   return $fetch("/api/attempt", {
     method: "POST",
     body: {
-      word: currentAttempt.value.word,
-      attemptIndex,
+      word: currentWord.value.join(""),
+      wordIndex: state.value?.attempts.length,
     },
     onResponse() {
       attemptPending = false;
@@ -72,8 +57,10 @@ function sendAttempt() {
 
 <template>
   <main>
-    <WordleBoard :attempts="state?.attempts ?? []" />
-    <WordleKeyboard :keys="state?.keys ?? {}" @press="handlePress" />
+    <template v-if="state">
+      <WordleBoard :attempts="state.attempts" :current-word="currentWord" />
+      <WordleKeyboard :keys="state.keys" @press="handlePress" />
+    </template>
   </main>
 </template>
 

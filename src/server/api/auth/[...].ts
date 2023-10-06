@@ -44,7 +44,7 @@ export default defineEventHandler((event) => {
               .parse(user);
 
             const value = {
-              id: discordProfile.id,
+              discord_id: discordProfile.id,
               name: discordProfile.global_name ?? discordProfile.username,
               avatar: defaultUser.image,
             };
@@ -52,7 +52,7 @@ export default defineEventHandler((event) => {
               .insert(userTable)
               .values(value)
               .onConflictDoUpdate({
-                target: userTable.id,
+                target: userTable.discord_id,
                 set: { name: value.name, avatar: value.avatar },
               })
               .returning()
@@ -64,7 +64,8 @@ export default defineEventHandler((event) => {
         session({ token, session }) {
           const user = z
             .object({
-              id: z.string(),
+              id: z.number(),
+              discord_id: z.string(),
               name: z.string(),
               avatar: z.string(),
             })

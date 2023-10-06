@@ -1,11 +1,5 @@
 <script setup lang="ts">
 const { signIn, signOut, data, status } = useAuth();
-
-watchEffect(() => {
-  if (data.value) {
-    console.log(data.value);
-  }
-});
 </script>
 
 <template>

@@ -11,8 +11,8 @@ export class WordleGame {
     word: string;
     result: CharResult[];
     user: {
-      username: string;
-      avatar: string | null;
+      name: string;
+      avatar: string;
     };
   }[] = [];
   private status: "PLAYING" | "GAME_OVER" = "PLAYING";
@@ -47,8 +47,8 @@ export class WordleGame {
       word: string;
       result: string;
       user: {
-        username: string;
-        avatar: string | null;
+        name: string;
+        avatar: string;
       };
     }[]
   ) {
@@ -65,7 +65,7 @@ export class WordleGame {
   attempt(
     word: string,
     wordIndex: number,
-    user: { username: string; avatar: string | null },
+    user: { name: string; avatar: string },
     result?: CharResult[]
   ) {
     if (wordIndex !== this.attempts.length) {
@@ -125,8 +125,8 @@ export type WordleGameState = {
   attempts: {
     word: string;
     user: {
-      username: string;
-      avatar: string | null;
+      name: string;
+      avatar: string;
     };
     result: CharResult[];
   }[];
