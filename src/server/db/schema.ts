@@ -2,9 +2,9 @@ import { relations } from "drizzle-orm";
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 
 export const user = sqliteTable("user", {
-  id: integer("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  avatar: text("avatar"),
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  avatar: text("avatar").notNull(),
 });
 
 export const game = sqliteTable("game", {
