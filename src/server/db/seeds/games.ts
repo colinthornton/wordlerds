@@ -3,7 +3,7 @@ import { targets } from "~/assets/targets";
 import { getDateString } from "~/utils/getDateString";
 import { LibSQLDatabase } from "drizzle-orm/libsql";
 
-export async function seedGames(db: LibSQLDatabase<typeof schema>) {
+export async function seedDailyGames(db: LibSQLDatabase<typeof schema>) {
   const shuffledSolutions = shuffle(targets);
   const date = new Date();
   const games = shuffledSolutions.map((solution) => {
@@ -14,7 +14,7 @@ export async function seedGames(db: LibSQLDatabase<typeof schema>) {
     date.setDate(date.getDate() + 1);
     return game;
   });
-  const rows = await db.insert(schema.game).values(games).returning();
+  const rows = await db.insert(schema.coopDailyGame).values(games).returning();
   rows.forEach((row) => console.log(row));
 }
 

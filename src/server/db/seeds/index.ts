@@ -2,7 +2,8 @@ import { createClient } from "@libsql/client";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "../schema";
-import { seedGames } from "./games";
+import { seedDailyGames } from "./games";
+import { getDateString } from "~/utils/getDateString";
 
 runSeeds();
 
@@ -17,11 +18,11 @@ async function runSeeds() {
     schema,
   });
 
-  const currentGame = await db.query.game.findFirst({
+  const currentCoopDailyGame = await db.query.coopDailyGame.findFirst({
     columns: { id: true },
-    where: eq(schema.game.date, new Date().toISOString().slice(10)),
+    where: eq(schema.coopDailyGame.date, getDateString()),
   });
-  if (!currentGame) {
-    await seedGames(db);
+  if (!currentCoopDailyGame) {
+    await seedDailyGames(db);
   }
 }

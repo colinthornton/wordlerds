@@ -7,14 +7,7 @@ import {
 import { dictionary } from "~/assets/dictionary";
 
 export class WordleGame {
-  private attempts: {
-    word: string;
-    result: CharResult[];
-    user: {
-      name: string;
-      avatar: string;
-    };
-  }[] = [];
+  private attempts: WordleGameState["attempts"] = [];
   private status: "PLAYING" | "GAME_OVER" = "PLAYING";
 
   get id() {
@@ -47,6 +40,7 @@ export class WordleGame {
       word: string;
       result: string;
       user: {
+        id: number;
         name: string;
         avatar: string;
       };
@@ -65,7 +59,7 @@ export class WordleGame {
   attempt(
     word: string,
     wordIndex: number,
-    user: { name: string; avatar: string },
+    user: { id: number; name: string; avatar: string },
     result?: CharResult[]
   ) {
     if (wordIndex !== this.attempts.length) {
@@ -125,6 +119,7 @@ export type WordleGameState = {
   attempts: {
     word: string;
     user: {
+      id: number;
       name: string;
       avatar: string;
     };

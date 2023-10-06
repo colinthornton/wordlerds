@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data } = useFetch("/api/coopdaily");
+const { data } = useFetch("/api/coopmugen");
 
 const { session } = useAuth();
 const canPlay = computed(
@@ -16,7 +16,7 @@ async function sendAttempt(word: string) {
   if (!data.value) return;
 
   attemptPending = true;
-  const newState = await $fetch("/api/coopdaily/attempt", {
+  const newState = await $fetch("/api/coopmugen/attempt", {
     method: "POST",
     body: {
       word,
@@ -35,7 +35,6 @@ async function sendAttempt(word: string) {
 
 <template>
   <h1>Co-op Daily</h1>
-  <h2>{{ data?.date }}</h2>
   <WordleGame
     v-if="data"
     :state="data.state"

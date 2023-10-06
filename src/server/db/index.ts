@@ -1,5 +1,5 @@
 import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
+import { LibSQLDatabase, drizzle } from "drizzle-orm/libsql";
 import * as schema from "./schema";
 
 const { databaseUrl, databaseAuthToken } = useRuntimeConfig();
@@ -15,3 +15,5 @@ export const db = drizzle(client, {
 });
 
 export * from "./schema";
+
+export type WordlerdsDB = LibSQLDatabase<typeof schema>;

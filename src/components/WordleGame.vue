@@ -1,29 +1,34 @@
 <script setup lang="ts">
-const { data: state, error } = await useFetch("/api/game");
-if (!state.value) {
-  throw error.value;
-}
+import { type WordleGameState } from "~/server/models/WordleGame";
+
+const props = defineProps<{
+  state: WordleGameState;
+  canPlay: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "attempt", word: string): void;
+}>();
 
 const MAX_CHARS = 5;
 const currentWord = ref(new Array(MAX_CHARS).fill("")) as Ref<string[]>;
 let charIndex = 0;
 
-let attemptPending = false;
+watch(
+  () => props.state,
+  () => {
+    currentWord.value = new Array(MAX_CHARS).fill("");
+    charIndex = 0;
+  }
+);
+
 async function handlePress(key: string) {
-  if (!state.value) return;
-  if (state.value.status === "GAME_OVER") return;
-  if (attemptPending) return;
+  if (!props.canPlay) return;
 
   switch (key) {
     case "enter":
       if (charIndex !== MAX_CHARS) return;
-      const newState = await sendAttempt();
-      if (!newState) {
-        throw createError(new Error("Something went wrong"));
-      }
-      state.value = newState;
-      currentWord.value = new Array(MAX_CHARS).fill("");
-      charIndex = 0;
+      emit("attempt", currentWord.value.join(""));
       break;
     case "backspace":
       if (charIndex === 0) return;
@@ -35,23 +40,6 @@ async function handlePress(key: string) {
       currentWord.value[charIndex] = key;
       charIndex++;
   }
-}
-
-function sendAttempt() {
-  attemptPending = true;
-  return $fetch("/api/attempt", {
-    method: "POST",
-    body: {
-      word: currentWord.value.join(""),
-      wordIndex: state.value?.attempts.length,
-    },
-    onResponse() {
-      attemptPending = false;
-    },
-    onResponseError() {
-      reloadNuxtApp();
-    },
-  });
 }
 </script>
 

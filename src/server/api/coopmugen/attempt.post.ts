@@ -1,9 +1,9 @@
-import { authOptions } from "./auth/[...]";
+import { authOptions } from "~/server/api/auth/[...]";
 import { getServerSession } from "#auth";
 import { z } from "zod";
-import { getWordleGame } from "../models/getWordleGame";
-import { db, attempt } from "../db";
-import { WordleGameState } from "../models/WordleGame";
+import { getCoopMugenGame } from "~/server/models/getCoopMugenGame";
+import { db, attempt } from "~/server/db";
+import { WordleGameState } from "~/server/models/WordleGame";
 import { CharResult } from "~/types/CharResult";
 import { eq, and } from "drizzle-orm";
 
@@ -27,11 +27,11 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
   }
 
   // prevent multiple attempts
-  const wordleGame = await getWordleGame(db);
+  const { data, wordleGame } = await getCoopMugenGame(db);
   const currentGameAttempt = await db.query.attempt.findFirst({
     columns: { id: true },
     where: and(
-      eq(attempt.gameId, wordleGame.id),
+      eq(attempt.coopMugenGameId, data.id),
       eq(attempt.userId, session.user.id)
     ),
   });
@@ -48,11 +48,13 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
   }
 
   // save attempt
-  const gameId = wordleGame.id;
   const word = body.word;
-  await db
-    .insert(attempt)
-    .values({ gameId, userId: session.user.id, word, result: result.join("") });
+  await db.insert(attempt).values({
+    coopMugenGameId: data.id,
+    userId: session.user.id,
+    word,
+    result: result.join(""),
+  });
 
   return wordleGame.state;
 });

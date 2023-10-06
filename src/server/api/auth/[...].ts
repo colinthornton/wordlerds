@@ -20,8 +20,6 @@ export const authOptions: AuthConfig = {
       return runtimeConfig.playerIds.split(",").includes(profile?.id as string);
     },
     async jwt({ trigger, token, user, profile }) {
-      console.log("jwt");
-      console.log({ trigger, token, user, profile });
       if (trigger === "signIn") {
         // https://discord.com/developers/docs/resources/user#user-object
         const discordProfile = z
@@ -56,8 +54,6 @@ export const authOptions: AuthConfig = {
       return token;
     },
     session({ token, session }) {
-      console.log("session");
-      console.log({ token, session });
       const user = z
         .object({
           id: z.number(),

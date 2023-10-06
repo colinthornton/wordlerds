@@ -8,13 +8,25 @@ export const user = sqliteTable("user", {
   avatar: text("avatar").notNull(),
 });
 
-export const game = sqliteTable("game", {
+export const coopDailyGame = sqliteTable("coop_daily_game", {
   id: integer("id").primaryKey(),
   date: text("date", { length: 10 }).notNull().unique(),
   solution: text("solution", { length: 5 }).notNull(),
 });
 
-export const gameRelations = relations(game, ({ many }) => ({
+export const coopDailyGameRelations = relations(coopDailyGame, ({ many }) => ({
+  attempts: many(attempt),
+}));
+
+export const coopMugenGame = sqliteTable("coop_mugen_game", {
+  id: integer("id").primaryKey(),
+  solution: text("solution", { length: 5 }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
+export const coopMugenGameRelations = relations(coopMugenGame, ({ many }) => ({
   attempts: many(attempt),
 }));
 
@@ -22,9 +34,12 @@ export const attempt = sqliteTable("attempt", {
   id: integer("id").primaryKey(),
   word: text("word", { length: 5 }).notNull(),
   result: text("result", { length: 5 }).notNull(),
-  gameId: integer("game_id")
-    .notNull()
-    .references(() => game.id),
+  coopDailyGameId: integer("coop_daily_game_id").references(
+    () => coopDailyGame.id
+  ),
+  coopMugenGameId: integer("coop_mugen_game_id").references(
+    () => coopMugenGame.id
+  ),
   userId: integer("user_id")
     .notNull()
     .references(() => user.id),
@@ -34,9 +49,13 @@ export const attempt = sqliteTable("attempt", {
 });
 
 export const attemptRelations = relations(attempt, ({ one }) => ({
-  game: one(game, {
-    fields: [attempt.gameId],
-    references: [game.id],
+  coopDailyGame: one(coopDailyGame, {
+    fields: [attempt.coopDailyGameId],
+    references: [coopDailyGame.id],
+  }),
+  coopMugenGame: one(coopMugenGame, {
+    fields: [attempt.coopMugenGameId],
+    references: [coopMugenGame.id],
   }),
   user: one(user, {
     fields: [attempt.userId],

@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "51478d54-2553-4cf7-b11f-1a2dcd1123cd",
+  "id": "f8bc5fbd-dbf4-4be7-8b52-1a7cb4b7cfb2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "attempt": {
@@ -28,11 +28,18 @@
           "notNull": true,
           "autoincrement": false
         },
-        "game_id": {
-          "name": "game_id",
+        "coop_daily_game_id": {
+          "name": "coop_daily_game_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "coop_mugen_game_id": {
+          "name": "coop_mugen_game_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "user_id": {
@@ -52,12 +59,25 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "attempt_game_id_game_id_fk": {
-          "name": "attempt_game_id_game_id_fk",
+        "attempt_coop_daily_game_id_coop_daily_game_id_fk": {
+          "name": "attempt_coop_daily_game_id_coop_daily_game_id_fk",
           "tableFrom": "attempt",
-          "tableTo": "game",
+          "tableTo": "coop_daily_game",
           "columnsFrom": [
-            "game_id"
+            "coop_daily_game_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "attempt_coop_mugen_game_id_coop_mugen_game_id_fk": {
+          "name": "attempt_coop_mugen_game_id_coop_mugen_game_id_fk",
+          "tableFrom": "attempt",
+          "tableTo": "coop_mugen_game",
+          "columnsFrom": [
+            "coop_mugen_game_id"
           ],
           "columnsTo": [
             "id"
@@ -82,8 +102,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "game": {
-      "name": "game",
+    "coop_daily_game": {
+      "name": "coop_daily_game",
       "columns": {
         "id": {
           "name": "id",
@@ -108,14 +128,44 @@
         }
       },
       "indexes": {
-        "game_date_unique": {
-          "name": "game_date_unique",
+        "coop_daily_game_date_unique": {
+          "name": "coop_daily_game_date_unique",
           "columns": [
             "date"
           ],
           "isUnique": true
         }
       },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "coop_mugen_game": {
+      "name": "coop_mugen_game",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "solution": {
+          "name": "solution",
+          "type": "text(5)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
