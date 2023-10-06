@@ -36,7 +36,7 @@ export const coopDailyAttempt = sqliteTable("coop_daily_attempt", {
 export const coopDailyAttemptRelations = relations(
   coopDailyAttempt,
   ({ one }) => ({
-    coopDailyGame: one(coopDailyGame, {
+    game: one(coopDailyGame, {
       fields: [coopDailyAttempt.gameId],
       references: [coopDailyGame.id],
     }),
@@ -77,7 +77,7 @@ export const coopMugenAttempt = sqliteTable("coop_mugen_attempt", {
 export const coopMugenAttemptRelations = relations(
   coopMugenAttempt,
   ({ one }) => ({
-    coopDailyGame: one(coopMugenGame, {
+    game: one(coopMugenGame, {
       fields: [coopMugenAttempt.gameId],
       references: [coopMugenGame.id],
     }),
