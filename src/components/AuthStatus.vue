@@ -3,16 +3,21 @@ const { signIn, signOut, data, status } = useAuth();
 </script>
 
 <template>
-  <div class="auth-status">
-    <template v-if="status === 'authenticated'">
-      <button @click="signOut()">Sign Out</button>
-      <img class="image" :src="data?.user?.avatar" width="128" height="128" />
-      <span>{{ data?.user?.name }}</span>
-    </template>
-    <button v-else-if="status === 'unauthenticated'" @click="signIn('discord')">
-      Sign In
-    </button>
-  </div>
+  <ClientOnly>
+    <div class="auth-status">
+      <template v-if="status === 'authenticated'">
+        <button @click="signOut()">Sign Out</button>
+        <img class="image" :src="data?.user?.avatar" width="128" height="128" />
+        <span>{{ data?.user?.name }}</span>
+      </template>
+      <button
+        v-else-if="status === 'unauthenticated'"
+        @click="signIn('discord')"
+      >
+        Sign In
+      </button>
+    </div>
+  </ClientOnly>
 </template>
 
 <style scoped>

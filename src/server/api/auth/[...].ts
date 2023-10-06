@@ -15,11 +15,12 @@ export default defineEventHandler((event) => {
       debug: process.env.NODE_ENV === "development",
       secret: authSecret,
       providers: [
-        DiscordProvider({
+        // @ts-expect-error "You need to use .default here for it to work during SSR. May be fixed via Vite at some point" - https://sidebase.io/nuxt-auth/getting-started/quick-start
+        (DiscordProvider.default as typeof DiscordProvider)({
           clientId: discordClientId,
           clientSecret: discordClientSecret,
           authorization:
-            "https://discord.com/api/oauth2/authorize?scope=identify",
+            "https://discord.com/api/oauth2/authorize?scope=identify", // don't need email
         }),
       ],
       callbacks: {
