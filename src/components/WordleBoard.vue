@@ -27,7 +27,7 @@ function getCharClass(row: number, col: number) {
     case RESULT_INCORRECT_PLACE:
       return "bg-yellow-400 text-gray-900";
     case RESULT_CORRECT:
-      return "bg-lime-500";
+      return "bg-lime-500 text-gray-900";
     default:
       return "";
   }
