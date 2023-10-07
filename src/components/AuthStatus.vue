@@ -3,35 +3,18 @@ const { signIn, signOut, status, session } = useAuth();
 </script>
 
 <template>
-  <div class="auth-status">
+  <div class="flex items-center gap-2">
     <template v-if="status === 'authenticated'">
-      <button @click="signOut()">Sign Out</button>
-      <img
-        class="image"
-        :src="session?.user?.avatar"
-        width="128"
-        height="128"
-      />
-      <span>{{ session?.user?.name }}</span>
+      <UButton @click="signOut()" label="Sign Out" size="xs" />
+      <UAvatar :src="session?.user?.avatar" :alt="session?.user?.name" />
     </template>
-    <button v-else-if="status === 'unauthenticated'" @click="signIn('discord')">
-      Sign In
-    </button>
+    <UButton
+      v-else
+      :label="status === 'unauthenticated' ? 'Sign In' : ''"
+      size="xs"
+      :loading="status === 'loading'"
+      class="transition-all"
+      @click="signIn('discord')"
+    />
   </div>
 </template>
-
-<style scoped>
-.auth-status {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-  padding: 0.5em;
-  min-height: 2em;
-}
-
-.image {
-  border-radius: 9999px;
-  height: 2em;
-  width: auto;
-}
-</style>

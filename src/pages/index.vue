@@ -34,8 +34,6 @@ async function sendAttempt(word: string) {
 </script>
 
 <template>
-  <h1>Co-op Daily</h1>
-  <h2>{{ data?.date }}</h2>
   <WordleGame
     v-if="data"
     :state="data.state"
@@ -43,10 +41,3 @@ async function sendAttempt(word: string) {
     @attempt="sendAttempt"
   />
 </template>
-
-<style scoped>
-h1,
-h2 {
-  text-align: center;
-}
-</style>

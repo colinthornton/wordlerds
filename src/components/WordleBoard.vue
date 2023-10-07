@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { CharResult } from "~/types/CharResult";
+import {
+  RESULT_NOT_FOUND,
+  type CharResult,
+  RESULT_INCORRECT_PLACE,
+  RESULT_CORRECT,
+} from "~/types/CharResult";
 
 const props = defineProps<{
   attempts: {
@@ -13,84 +18,58 @@ const props = defineProps<{
   currentWord: string[];
 }>();
 
-const emptyRows = computed(() => 6 - props.attempts.length - 1);
+function getCharClass(row: number, col: number) {
+  if (row > props.attempts.length) return "";
+  const result = props.attempts[row - 1].result[col - 1];
+  switch (result) {
+    case RESULT_NOT_FOUND:
+      return "bg-gray-800";
+    case RESULT_INCORRECT_PLACE:
+      return "bg-yellow-400 text-gray-900";
+    case RESULT_CORRECT:
+      return "bg-lime";
+    default:
+      return "";
+  }
+}
+
+function getChar(row: number, col: number) {
+  if (row <= props.attempts.length) {
+    return props.attempts[row - 1].word[col - 1];
+  }
+  if (row === props.attempts.length + 1) {
+    return props.currentWord[col - 1];
+  }
+  return "";
+}
+
+function getAttemptUser(row: number) {
+  return props.attempts[row - 1]?.user;
+}
 </script>
 
 <template>
-  <div class="board">
-    <div v-for="row in attempts" class="word">
-      <img
-        class="avatar"
-        :title="row.user.name"
-        :src="row.user.avatar"
-        :alt="row.user.name"
-        width="128"
-        height="128"
+  <div
+    class="grid grid-rows-6 gap-1.5 mx-auto max-w-full w-[350px] h-[420px] p-2.5"
+  >
+    <div v-for="row in 6" class="grid grid-cols-5 gap-1.5 relative">
+      <UAvatar
+        v-if="getAttemptUser(row)"
+        :src="getAttemptUser(row).avatar"
+        class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 -z-10"
       />
       <div
-        v-for="(char, i) in row.word.split('')"
-        class="char"
-        :class="`result-${row.result[i]}`"
+        v-for="col in 5"
+        class="grid place-items-center border-2 border-gray-700 text-3xl font-bold uppercase"
+        :class="getCharClass(row, col)"
       >
-        {{ char }}
+        {{ getChar(row, col) }}
       </div>
-    </div>
-    <div class="word">
-      <div v-for="char in currentWord" class="char">{{ char }}</div>
-    </div>
-    <div v-for="i in emptyRows" class="word">
-      <div v-for="i in 5" class="char" />
+      <UAvatar
+        v-if="getAttemptUser(row)"
+        :src="getAttemptUser(row).avatar"
+        class="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/2 -z-10"
+      />
     </div>
   </div>
 </template>
-
-<style scoped>
-.board {
-  width: 100%;
-  max-width: 350px;
-  height: 420px;
-  display: grid;
-  gap: 5px;
-  grid-auto-rows: 1fr;
-}
-
-.word {
-  position: relative;
-  display: grid;
-  gap: 5px;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-}
-
-.avatar {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  left: -3rem;
-  width: 2rem;
-  height: auto;
-  border-radius: 9999px;
-}
-
-.char {
-  font-size: 2rem;
-  font-family: system-ui, sans-serif;
-  font-weight: bold;
-  text-transform: uppercase;
-  display: grid;
-  place-items: center;
-  border: 2px solid black;
-}
-
-.result-0 {
-  background: lightgray;
-}
-
-.result-1 {
-  background: yellow;
-}
-
-.result-2 {
-  background: yellowgreen;
-}
-</style>

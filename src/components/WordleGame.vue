@@ -44,20 +44,13 @@ async function handlePress(key: string) {
 </script>
 
 <template>
-  <main>
+  <UContainer
+    as="main"
+    class="grid grid-cols-1 grid-rows-[1fr,auto] pb-4 items-center"
+  >
     <template v-if="state">
       <WordleBoard :attempts="state.attempts" :current-word="currentWord" />
       <WordleKeyboard :keys="state.keys" @press="handlePress" />
     </template>
-  </main>
+  </UContainer>
 </template>
-
-<style scoped>
-main {
-  display: grid;
-  place-items: center;
-  grid-template-rows: 1fr auto;
-  gap: 1em;
-  padding: 1em;
-}
-</style>

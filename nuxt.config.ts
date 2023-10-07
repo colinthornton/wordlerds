@@ -17,13 +17,6 @@ export default defineNuxtConfig({
       ],
     },
   },
-  appConfig: {
-    ui: {
-      primary: "lime",
-      gray: "cool",
-      colors: ["lime", "yellow"],
-    },
-  },
   colorMode: {
     preference: "dark",
   },
