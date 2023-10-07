@@ -17,8 +17,18 @@ export default defineNuxtConfig({
       ],
     },
   },
+  appConfig: {
+    ui: {
+      primary: "lime",
+      gray: "cool",
+      colors: ["lime", "yellow"],
+    },
+  },
+  colorMode: {
+    preference: "dark",
+  },
   devtools: { enabled: false },
-  modules: ["@hebilicious/authjs-nuxt"],
+  modules: ["@hebilicious/authjs-nuxt", "@nuxt/ui"],
   runtimeConfig: {
     databaseUrl:
       process.env.NUXT_DATABASE_URL ?? "file:./src/server/db/local.db",
