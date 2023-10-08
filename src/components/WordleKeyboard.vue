@@ -10,14 +10,26 @@ const props = defineProps<{
   keys: Record<string, CharResult>;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: "press", key: string): void;
 }>();
+
+function emitKeydown(e: KeyboardEvent) {
+  if (e.key && keyboard.flat().includes(e.key)) {
+    emit("press", e.key);
+  }
+}
+onMounted(() => {
+  window.addEventListener("keydown", emitKeydown, { passive: true });
+});
+onUnmounted(() => {
+  window.removeEventListener("keydown", emitKeydown);
+});
 
 const keyboard = [
   ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
   ["", "a", "s", "d", "f", "g", "h", "j", "k", "l", ""],
-  ["enter", "z", "x", "c", "v", "b", "n", "m", "backspace"],
+  ["Enter", "z", "x", "c", "v", "b", "n", "m", "Backspace"],
 ];
 
 function getKeyColor(key: string) {
@@ -32,9 +44,9 @@ function getKeyColor(key: string) {
 
 function getKeyIcon(key: string) {
   switch (key) {
-    case "backspace":
+    case "Backspace":
       return "i-heroicons-backspace";
-    case "enter":
+    case "Enter":
       return "i-heroicons-paper-airplane";
     default:
       return "";
@@ -43,8 +55,8 @@ function getKeyIcon(key: string) {
 
 function getKeyLabel(key: string) {
   switch (key) {
-    case "backspace":
-    case "enter":
+    case "Backspace":
+    case "Enter":
       return undefined;
     default:
       return key;
@@ -53,8 +65,8 @@ function getKeyLabel(key: string) {
 
 function getKeyClass(key: string) {
   switch (key) {
-    case "backspace":
-    case "enter":
+    case "Backspace":
+    case "Enter":
       return "flex-[1.5] max-w-none";
     default:
       return "";

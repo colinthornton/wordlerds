@@ -30,11 +30,11 @@ async function handlePress(key: string) {
   }
 
   switch (key) {
-    case "enter":
+    case "Enter":
       if (charIndex !== MAX_CHARS) return;
       emit("attempt", currentWord.value.join(""));
       break;
-    case "backspace":
+    case "Backspace":
       if (charIndex === 0) return;
       charIndex--;
       currentWord.value[charIndex] = "";
