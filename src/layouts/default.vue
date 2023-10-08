@@ -12,5 +12,6 @@
       </UContainer>
     </header>
     <slot />
+    <UNotifications />
   </div>
 </template>

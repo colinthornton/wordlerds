@@ -25,7 +25,7 @@ function getKeyColor(key: string) {
     {
       [RESULT_NOT_FOUND]: "gray",
       [RESULT_INCORRECT_PLACE]: "yellow",
-      [RESULT_CORRECT]: "lime",
+      [RESULT_CORRECT]: "primary",
     }[props.keys[key]] ?? "black"
   );
 }

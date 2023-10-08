@@ -8,6 +8,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "attempt", word: string): void;
+  (e: "blockpress"): void;
 }>();
 
 const MAX_CHARS = 5;
@@ -23,7 +24,10 @@ watch(
 );
 
 async function handlePress(key: string) {
-  if (!props.canPlay) return;
+  if (!props.canPlay) {
+    emit("blockpress");
+    return;
+  }
 
   switch (key) {
     case "enter":

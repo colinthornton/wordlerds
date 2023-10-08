@@ -6,6 +6,7 @@ import { db, coopMugenAttempt } from "~/server/db";
 import { WordleGameState } from "~/server/models/WordleGame";
 import { CharResult } from "~/types/CharResult";
 import { eq, and } from "drizzle-orm";
+import { EcodeError } from "~/types/errors";
 
 export default defineEventHandler(async (event): Promise<WordleGameState> => {
   // validate input
@@ -44,7 +45,10 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
   try {
     result = wordleGame.attempt(body.word, body.wordIndex, session.user);
   } catch (error) {
-    throw createError({ statusCode: 400 });
+    if (error instanceof EcodeError) {
+      throw createError({ status: 400, data: { ecode: error.ecode } });
+    }
+    throw createError({ status: 400 });
   }
 
   // save attempt

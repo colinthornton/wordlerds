@@ -4,6 +4,7 @@ import {
   RESULT_INCORRECT_PLACE,
   RESULT_NOT_FOUND,
 } from "~/types/CharResult";
+import { WordleGameDesyncError, WordleInvalidWordError } from "~/types/errors";
 import { dictionary } from "~/assets/dictionary";
 
 export class WordleGame {
@@ -111,9 +112,6 @@ export class WordleGame {
     return result;
   }
 }
-
-export class WordleInvalidWordError extends Error {}
-export class WordleGameDesyncError extends Error {}
 
 export type WordleGameState = {
   attempts: {
