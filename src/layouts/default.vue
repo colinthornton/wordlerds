@@ -21,6 +21,14 @@ const menuLinks = [
     ],
   },
 ];
+
+// close menu when nav link is clicked
+watch(
+  () => useRoute().fullPath,
+  () => {
+    menuOpen.value = false;
+  }
+);
 </script>
 
 <template>
