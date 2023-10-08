@@ -8,6 +8,7 @@ import {
 
 const props = defineProps<{
   keys: Record<string, CharResult>;
+  attemptPending: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -84,6 +85,7 @@ function getKeyClass(key: string) {
           variant="solid"
           :icon="getKeyIcon(key)"
           :label="getKeyLabel(key)"
+          :loading="key === 'Enter' && attemptPending"
           class="flex-1 uppercase font-bold justify-center h-14"
           :class="getKeyClass(key)"
           @click="$emit('press', key)"

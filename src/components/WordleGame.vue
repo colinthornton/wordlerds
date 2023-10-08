@@ -4,6 +4,7 @@ import { type WordleGameState } from "~/server/models/WordleGame";
 const props = defineProps<{
   state: WordleGameState;
   canPlay: boolean;
+  attemptPending: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -54,7 +55,11 @@ async function handlePress(key: string) {
   >
     <template v-if="state">
       <WordleBoard :attempts="state.attempts" :current-word="currentWord" />
-      <WordleKeyboard :keys="state.keys" @press="handlePress" />
+      <WordleKeyboard
+        :keys="state.keys"
+        :attempt-pending="attemptPending"
+        @press="handlePress"
+      />
     </template>
   </UContainer>
 </template>

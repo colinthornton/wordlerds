@@ -26,19 +26,19 @@ const hasPlayed = computed(() => {
   return state.attempts.some((attempt) => attempt.user.id === user.id);
 });
 const canPlay = computed(
-  () => !gameOver.value && !hasPlayed.value && !attemptPending
+  () => !gameOver.value && !hasPlayed.value && !attemptPending.value
 );
 
-let attemptPending = false;
+let attemptPending = ref(false);
 async function sendAttempt(word: string) {
-  if (!data.value || attemptPending) return;
+  if (!data.value || attemptPending.value) return;
 
   if (!dictionary.includes(word)) {
     useToast().add({ title: "Not in word list", color: "yellow" });
     return;
   }
 
-  attemptPending = true;
+  attemptPending.value = true;
   try {
     const newState = await $fetch("/api/coopmugen/attempt", {
       method: "POST",
@@ -47,7 +47,7 @@ async function sendAttempt(word: string) {
         wordIndex: data.value.state.attempts.length,
       },
       onResponse() {
-        attemptPending = false;
+        attemptPending.value = false;
       },
     });
     data.value.state = newState;
@@ -83,6 +83,7 @@ function toastError() {
     v-if="data"
     :state="data.state"
     :can-play="canPlay"
+    :attempt-pending="attemptPending"
     @attempt="sendAttempt"
     @blockpress="toastError"
   />
