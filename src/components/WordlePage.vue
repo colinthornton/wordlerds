@@ -40,7 +40,7 @@ async function sendAttempt(word: string) {
 
   attemptPending.value = true;
   try {
-    const newState = await $fetch("/api/coopmugen/attempt", {
+    const newState = await $fetch(props.sendUrl, {
       method: "POST",
       body: {
         word,
