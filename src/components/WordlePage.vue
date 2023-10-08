@@ -18,6 +18,12 @@ onUnmounted(() => {
 
 const { session, status } = useAuth();
 
+watch(status, () => {
+  if (status.value !== "authenticated") {
+    refreshNuxtData();
+  }
+});
+
 const gameOver = computed(() => data.value?.state.status === "GAME_OVER");
 const hasPlayed = computed(() => {
   const state = data.value?.state;
@@ -26,7 +32,11 @@ const hasPlayed = computed(() => {
   return state.attempts.some((attempt) => attempt.user.id === user.id);
 });
 const canPlay = computed(
-  () => !gameOver.value && !hasPlayed.value && !attemptPending.value
+  () =>
+    Boolean(session.value?.user) &&
+    !gameOver.value &&
+    !hasPlayed.value &&
+    !attemptPending.value
 );
 
 let attemptPending = ref(false);
@@ -34,7 +44,13 @@ async function sendAttempt(word: string) {
   if (!data.value || attemptPending.value) return;
 
   if (!dictionary.includes(word)) {
-    useToast().add({ title: "Not in word list", color: "yellow" });
+    useToast().remove("notinwordlist");
+    useToast().add({
+      id: "notinwordlist",
+      title: "Not in word list",
+      color: "yellow",
+      timeout: 2000,
+    });
     return;
   }
 
@@ -54,11 +70,23 @@ async function sendAttempt(word: string) {
   } catch (error: any) {
     switch (error?.data?.ecode) {
       case WordleGameDesyncError.ecode:
-        useToast().add({ title: "You're too slow", color: "yellow" });
+        useToast().remove("tooslow");
+        useToast().add({
+          id: "tooslow",
+          title: "You're too slow",
+          color: "yellow",
+          timeout: 2000,
+        });
         refreshNuxtData();
         break;
       case WordleInvalidWordError.ecode:
-        useToast().add({ title: "Not in word list", color: "yellow" });
+        useToast().remove("notinwordlist");
+        useToast().add({
+          id: "notinwordlist",
+          title: "Not in word list",
+          color: "yellow",
+          timeout: 2000,
+        });
         break;
       default:
         refreshNuxtData();
@@ -68,11 +96,23 @@ async function sendAttempt(word: string) {
 
 function toastError() {
   if (status.value !== "authenticated") {
-    useToast().add({ title: "Sign in to play", color: "yellow" });
+    useToast().remove("signin");
+    useToast().add({
+      id: "signin",
+      title: "Sign in to play",
+      color: "yellow",
+      timeout: 2000,
+    });
     return;
   }
   if (hasPlayed.value) {
-    useToast().add({ title: "You've already played", color: "yellow" });
+    useToast().remove("alreadyplayed");
+    useToast().add({
+      id: "alreadyplayed",
+      title: "You've already played",
+      color: "yellow",
+      timeout: 2000,
+    });
     return;
   }
 }
