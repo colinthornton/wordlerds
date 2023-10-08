@@ -1,3 +1,3 @@
 <template>
-  <WorldPage fetch-url="/api/coopmugen" send-url="/api/coopmugen/attempt" />
+  <WordlePage fetch-url="/api/coopmugen" send-url="/api/coopmugen/attempt" />
 </template>
