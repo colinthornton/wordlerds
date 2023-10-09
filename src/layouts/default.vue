@@ -5,8 +5,8 @@ const pageTitle = computed(() => {
   const path = useRoute().path;
   return (
     {
-      "/": "Co-op Daily",
-      "/coopmugen": "Co-op Mugen",
+      "/": "Squad Daily",
+      "/coopmugen": "Squad Mugen",
     }[path] ?? ""
   );
 });
@@ -14,10 +14,10 @@ const pageTitle = computed(() => {
 const menuOpen = useState(() => false);
 const menuLinks = [
   {
-    label: "Co-op",
+    label: "Squad",
     links: [
       { label: "Daily", to: "/" },
-      { label: "Mugen", to: "/coopmugen" },
+      { label: "Mugen", to: "/squadmugen" },
       { label: "Stats", to: "/stats" },
     ],
   },
