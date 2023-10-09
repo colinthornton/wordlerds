@@ -18,6 +18,7 @@ const menuLinks = [
     links: [
       { label: "Daily", to: "/" },
       { label: "Mugen", to: "/coopmugen" },
+      { label: "Stats", to: "/stats" },
     ],
   },
 ];

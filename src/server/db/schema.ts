@@ -8,6 +8,11 @@ export const user = sqliteTable("user", {
   avatar: text("avatar").notNull(),
 });
 
+export const userRelations = relations(user, ({ many }) => ({
+  coopDailyAttempts: many(coopDailyAttempt),
+  coopMugenAttempts: many(coopMugenAttempt),
+}));
+
 export const coopDailyGame = sqliteTable("coop_daily_game", {
   id: integer("id").primaryKey(),
   date: text("date", { length: 10 }).notNull().unique(),
