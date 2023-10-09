@@ -21,13 +21,13 @@ export default defineEventHandler(async (event) => {
     },
   });
   const userStats = users
+    .filter(
+      (user) =>
+        user.coopDailyAttempts.length > 0 || user.coopMugenAttempts.length > 0
+    )
     .map((user) => {
       const guesses =
         user.coopDailyAttempts.length + user.coopMugenAttempts.length;
-      if (guesses === 0) {
-        return undefined;
-      }
-
       const letters = guesses * 5;
       let blacks = 0;
       let yellows = 0;
@@ -63,8 +63,7 @@ export default defineEventHandler(async (event) => {
           green: formatPercentage(greens, letters),
         },
       };
-    })
-    .filter((user) => Boolean(user));
+    });
 
   return userStats;
 });
