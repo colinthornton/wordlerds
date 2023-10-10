@@ -7,21 +7,12 @@ const pageTitle = computed(() => {
     {
       "/": "Squad Daily",
       "/squadmugen": "Squad Mugen",
+      "/stats": "Stats",
     }[path] ?? ""
   );
 });
 
 const menuOpen = useState(() => false);
-const menuLinks = [
-  {
-    label: "Squad",
-    links: [
-      { label: "Daily", to: "/" },
-      { label: "Mugen", to: "/squadmugen" },
-      { label: "Stats", to: "/stats" },
-    ],
-  },
-];
 
 // close menu when nav link is clicked
 watch(
@@ -38,7 +29,15 @@ watch(
   >
     <header class="h-10 border-b border-b-gray-700">
       <UContainer class="flex justify-between items-center h-full px-4 py-2">
-        <UAvatar :src="session?.user?.avatar" />
+        <UPopover v-if="session?.user?.avatar">
+          <UButton variant="link">
+            <UAvatar :src="session?.user?.avatar" />
+          </UButton>
+          <template #panel>
+            <AuthStatus />
+          </template>
+        </UPopover>
+        <AuthStatus v-else />
         <h1 class="uppercase font-bold">
           {{ pageTitle }}
         </h1>
@@ -46,39 +45,25 @@ watch(
           icon="i-heroicons-bars-3"
           color="white"
           variant="ghost"
+          class="lg:invisible"
           @click="menuOpen = true"
         />
-        <USlideover
-          v-model="menuOpen"
-          :ui="{ base: 'p-4 gap-4' }"
-        >
-          <div class="flex justify-between">
-            <AuthStatus />
-            <UButton
-              icon="i-heroicons-x-mark"
-              color="white"
-              variant="ghost"
-              @click="menuOpen = false"
-            />
-          </div>
-          <UVerticalNavigation :links="menuLinks">
-            <template #default="{ link }">
-              <div class="relative text-left w-full">
-                <div class="mb-2">
-                  {{ link.label }}
-                </div>
-                <UVerticalNavigation
-                  v-if="link.links"
-                  :links="link.links"
-                  :ui="{ active: 'dark:text-primary' }"
-                />
-              </div>
-            </template>
-          </UVerticalNavigation>
+        <USlideover v-model="menuOpen">
+          <SideMenu
+            with-close
+            @close="menuOpen = false"
+          />
         </USlideover>
       </UContainer>
     </header>
-    <slot />
+    <div
+      class="mx-auto w-full max-w-5xl grid grid-rows-1 grid-cols-1 lg:grid-cols-10 justify-center"
+    >
+      <div class="lg:col-span-6 lg:col-start-3">
+        <slot />
+      </div>
+      <SideMenu class="hidden lg:flex col-span-2" />
+    </div>
     <UNotifications />
   </div>
 </template>

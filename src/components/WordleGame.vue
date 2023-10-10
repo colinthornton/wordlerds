@@ -51,7 +51,7 @@ async function handlePress(key: string) {
 <template>
   <UContainer
     as="main"
-    class="grid grid-cols-1 grid-rows-[1fr,auto] pb-4 items-center"
+    class="h-full grid grid-cols-1 grid-rows-[1fr,auto] pb-4 items-center"
   >
     <template v-if="state">
       <WordleBoard
