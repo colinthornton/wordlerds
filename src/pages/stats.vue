@@ -50,7 +50,10 @@ const tableRows = computed(() => {
       :ui="{ th: { base: 'text-right' }, td: { base: 'text-right' } }"
     >
       <template #user-data="{ row }">
-        <UAvatar :src="row.user.avatar" :alt="row.user.name" />
+        <UAvatar
+          :src="row.user.avatar"
+          :alt="row.user.name"
+        />
       </template>
       <template #green-data="{ row }">
         <span class="text-primary-500">{{ row.green }}</span>

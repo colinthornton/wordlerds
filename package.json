@@ -7,12 +7,19 @@
     "dev": "nuxt dev",
     "db:push": "drizzle-kit push:sqlite",
     "db:seed": "tsx src/server/db/seeds/index.ts",
-    "postinstall": "nuxt prepare"
+    "format": "prettier --check --ignore-path .gitignore .",
+    "lint": "eslint --ignore-path .gitignore .",
+    "postinstall": "nuxt prepare",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
+    "@nuxt/eslint-config": "^0.2.0",
     "drizzle-kit": "^0.19.13",
+    "eslint": "^8.51.0",
+    "husky": "^8.0.0",
     "nuxt": "^3.7.4",
+    "prettier": "^3.0.3",
     "tsx": "^3.13.0"
   },
   "dependencies": {
@@ -22,5 +29,11 @@
     "@nuxt/ui": "^2.9.0",
     "drizzle-orm": "^0.28.6",
     "zod": "^3.22.2"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@nuxt/eslint-config"
+    ]
   }
 }

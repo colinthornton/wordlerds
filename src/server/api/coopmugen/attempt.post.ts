@@ -33,7 +33,7 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
     columns: { id: true },
     where: and(
       eq(coopMugenAttempt.gameId, data.id),
-      eq(coopMugenAttempt.userId, session.user.id)
+      eq(coopMugenAttempt.userId, session.user.id),
     ),
   });
   if (currentGameAttempt) {

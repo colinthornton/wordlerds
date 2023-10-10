@@ -5,7 +5,7 @@ import {
   RESULT_NOT_FOUND,
 } from "~/types/CharResult";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async () => {
   const users = await db.query.user.findMany({
     with: {
       coopDailyAttempts: {
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   const userStats = users
     .filter(
       (user) =>
-        user.coopDailyAttempts.length > 0 || user.coopMugenAttempts.length > 0
+        user.coopDailyAttempts.length > 0 || user.coopMugenAttempts.length > 0,
     )
     .map((user) => {
       const guesses =
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
       let yellows = 0;
       let greens = 0;
       for (const { result: results } of user.coopDailyAttempts.concat(
-        user.coopMugenAttempts
+        user.coopMugenAttempts,
       )) {
         for (const result of results) {
           switch (Number(result)) {

@@ -49,7 +49,7 @@ export const coopDailyAttemptRelations = relations(
       fields: [coopDailyAttempt.userId],
       references: [user.id],
     }),
-  })
+  }),
 );
 
 export const coopMugenGame = sqliteTable("coop_mugen_game", {
@@ -90,5 +90,5 @@ export const coopMugenAttemptRelations = relations(
       fields: [coopMugenAttempt.userId],
       references: [user.id],
     }),
-  })
+  }),
 );

@@ -5,11 +5,11 @@ const { signIn, signOut, status } = useAuth();
 <template>
   <UButton
     v-if="status === 'authenticated'"
-    @click="signOut()"
     label="Log Out"
     size="xs"
     variant="outline"
     color="yellow"
+    @click="signOut()"
   />
   <UButton
     v-else

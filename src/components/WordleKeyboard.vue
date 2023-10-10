@@ -77,8 +77,15 @@ function getKeyClass(key: string) {
 
 <template>
   <div class="flex flex-col gap-2 max-w-full w-[484px] mx-auto">
-    <div v-for="row of keyboard" class="flex gap-2 justify-center">
-      <template v-for="key of row">
+    <div
+      v-for="row of keyboard"
+      :key="row.join('')"
+      class="flex gap-2 justify-center"
+    >
+      <template
+        v-for="key of row"
+        :key="key"
+      >
         <UButton
           v-if="key"
           :color="getKeyColor(key)"
@@ -90,7 +97,10 @@ function getKeyClass(key: string) {
           :class="getKeyClass(key)"
           @click="$emit('press', key)"
         />
-        <div v-else class="flex-[0.5]"></div>
+        <div
+          v-else
+          class="flex-[0.5]"
+        />
       </template>
     </div>
   </div>

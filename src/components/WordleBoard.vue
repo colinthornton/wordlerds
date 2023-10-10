@@ -52,7 +52,11 @@ function getAttemptUser(row: number) {
   <div
     class="grid grid-rows-6 gap-1.5 mx-auto max-w-full w-[350px] h-[420px] p-2.5"
   >
-    <div v-for="row in 6" class="grid grid-cols-5 gap-1.5 relative">
+    <div
+      v-for="row in 6"
+      :key="row"
+      class="grid grid-cols-5 gap-1.5 relative"
+    >
       <UAvatar
         v-if="getAttemptUser(row)"
         :src="getAttemptUser(row).avatar"
@@ -60,6 +64,7 @@ function getAttemptUser(row: number) {
       />
       <div
         v-for="col in 5"
+        :key="col"
         class="grid place-items-center border-2 border-gray-700 text-3xl font-bold uppercase"
         :class="getCharClass(row, col)"
       >

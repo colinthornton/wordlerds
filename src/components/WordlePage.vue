@@ -36,10 +36,10 @@ const canPlay = computed(
     Boolean(session.value?.user) &&
     !gameOver.value &&
     !hasPlayed.value &&
-    !attemptPending.value
+    !attemptPending.value,
 );
 
-let attemptPending = ref(false);
+const attemptPending = ref(false);
 async function sendAttempt(word: string) {
   if (!data.value || attemptPending.value) return;
 

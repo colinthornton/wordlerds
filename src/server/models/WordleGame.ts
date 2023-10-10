@@ -45,15 +45,15 @@ export class WordleGame {
         name: string;
         avatar: string;
       };
-    }[]
+    }[],
   ) {
     attempts.forEach((attempt, i) =>
       this.attempt(
         attempt.word,
         i,
         attempt.user,
-        attempt.result.split("").map(Number) as CharResult[]
-      )
+        attempt.result.split("").map(Number) as CharResult[],
+      ),
     );
   }
 
@@ -61,7 +61,7 @@ export class WordleGame {
     word: string,
     wordIndex: number,
     user: { id: number; name: string; avatar: string },
-    result?: CharResult[]
+    result?: CharResult[],
   ) {
     if (wordIndex !== this.attempts.length) {
       throw new WordleGameDesyncError();
@@ -90,7 +90,7 @@ export class WordleGame {
   private getResult(attempt: string[]) {
     const solutionChars = this.solution.split("");
     const result: CharResult[] = new Array(this.solution.length).fill(
-      RESULT_NOT_FOUND
+      RESULT_NOT_FOUND,
     );
 
     for (let i = 0; i < attempt.length; i++) {
@@ -102,7 +102,7 @@ export class WordleGame {
     for (let i = 0; i < attempt.length; i++) {
       if (result[i] === RESULT_CORRECT) continue;
       const targetIndex = solutionChars.findIndex(
-        (char) => attempt[i] === char
+        (char) => attempt[i] === char,
       );
       if (targetIndex === -1) continue;
       result[i] = RESULT_INCORRECT_PLACE;
