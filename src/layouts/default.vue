@@ -6,7 +6,7 @@ const pageTitle = computed(() => {
   return (
     {
       "/": "Squad Daily",
-      "/coopmugen": "Squad Mugen",
+      "/squadmugen": "Squad Mugen",
     }[path] ?? ""
   );
 });
