@@ -32,11 +32,13 @@ export default defineNuxtConfig({
     discord: {
       clientId: process.env.NUXT_DISCORD_CLIENT_ID,
       clientSecret: process.env.NUXT_DISCORD_CLIENT_SECRET,
+      webhookUrl: process.env.NUXT_DISCORD_WEBHOOK_URL,
     },
     playerIds: process.env.NUXT_PLAYER_IDS,
     public: {
       authJs: {
-        baseUrl: process.env.NUXT_PUBLIC_AUTH_JS_BASE_URL,
+        baseUrl:
+          process.env.NUXT_PUBLIC_AUTH_JS_BASE_URL ?? "http://localhost:3000",
       },
     },
   },

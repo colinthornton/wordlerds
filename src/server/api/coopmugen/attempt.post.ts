@@ -7,6 +7,7 @@ import { WordleGameState } from "~/server/models/WordleGame";
 import { CharResult } from "~/types/CharResult";
 import { eq, and } from "drizzle-orm";
 import { EcodeError } from "~/types/errors";
+import { getWebhookBody } from "~/server/utils/sendWebhook";
 
 export default defineEventHandler(async (event): Promise<WordleGameState> => {
   // validate input
@@ -59,6 +60,24 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
     word,
     result: result.join(""),
   });
+
+  // send webhook
+  const { webhookUrl } = useRuntimeConfig().discord;
+  if (webhookUrl) {
+    $fetch(webhookUrl, {
+      method: "POST",
+      body: getWebhookBody(
+        `SQUAD MUGEN ${wordleGame.id}`,
+        new URL("/squadmugen", useRuntimeConfig().public.authJs.baseUrl),
+        session.user.discord_id,
+        {
+          count: body.wordIndex + 1,
+          word: body.word,
+          result,
+        },
+      ),
+    });
+  }
 
   return wordleGame.state;
 });
