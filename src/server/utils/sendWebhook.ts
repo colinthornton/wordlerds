@@ -12,7 +12,7 @@ export function getWebhookBody(
   gameTitle: string,
   gameLink: string | URL,
   discordId: string,
-  attempt: { count: number; word: string; result: CharResult[] }
+  attempt: { count: number; word: string; result: CharResult[] },
 ) {
   const squares = attempt.result
     .map(
@@ -21,7 +21,7 @@ export function getWebhookBody(
           [RESULT_NOT_FOUND]: "⬛",
           [RESULT_INCORRECT_PLACE]: "🟨",
           [RESULT_CORRECT]: "🟩",
-        })[r]
+        })[r],
     )
     .join("");
   const word = attempt.word.toUpperCase();

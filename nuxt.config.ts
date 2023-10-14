@@ -37,8 +37,7 @@ export default defineNuxtConfig({
     playerIds: process.env.NUXT_PLAYER_IDS,
     public: {
       authJs: {
-        baseUrl:
-          process.env.NUXT_PUBLIC_AUTH_JS_BASE_URL ?? "http://localhost:3000",
+        baseUrl: process.env.NUXT_PUBLIC_AUTH_JS_BASE_URL,
       },
     },
   },

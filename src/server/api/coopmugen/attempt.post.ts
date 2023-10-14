@@ -34,7 +34,7 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
     columns: { id: true },
     where: and(
       eq(coopMugenAttempt.gameId, data.id),
-      eq(coopMugenAttempt.userId, session.user.id),
+      eq(coopMugenAttempt.userId, session.user.id)
     ),
   });
   if (currentGameAttempt) {
@@ -64,19 +64,23 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
   // send webhook
   const { webhookUrl } = useRuntimeConfig().discord;
   if (webhookUrl) {
-    $fetch(webhookUrl, {
-      method: "POST",
-      body: getWebhookBody(
-        `SQUAD MUGEN ${wordleGame.id}`,
-        new URL("/squadmugen", useRuntimeConfig().public.authJs.baseUrl),
-        session.user.discord_id,
-        {
-          count: body.wordIndex + 1,
-          word: body.word,
-          result,
-        },
-      ),
-    });
+    try {
+      await $fetch(webhookUrl, {
+        method: "POST",
+        body: getWebhookBody(
+          `SQUAD MUGEN ${wordleGame.id}`,
+          new URL("/squadmugen", useRuntimeConfig().public.authJs.baseUrl),
+          session.user.discord_id,
+          {
+            count: body.wordIndex + 1,
+            word: body.word,
+            result,
+          }
+        ),
+      });
+    } catch (error) {
+      console.warn(error);
+    }
   }
 
   return wordleGame.state;
