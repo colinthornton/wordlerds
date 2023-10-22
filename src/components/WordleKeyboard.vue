@@ -82,10 +82,7 @@ function getKeyClass(key: string) {
       :key="row.join('')"
       class="flex gap-2 justify-center"
     >
-      <template
-        v-for="key of row"
-        :key="key"
-      >
+      <template v-for="key of row" :key="key">
         <UButton
           v-if="key"
           :color="getKeyColor(key)"
@@ -93,14 +90,12 @@ function getKeyClass(key: string) {
           :icon="getKeyIcon(key)"
           :label="getKeyLabel(key)"
           :loading="key === 'Enter' && attemptPending"
+          :padded="false"
           class="flex-1 uppercase font-bold justify-center h-14"
           :class="getKeyClass(key)"
           @click="$emit('press', key)"
         />
-        <div
-          v-else
-          class="flex-[0.5]"
-        />
+        <div v-else class="flex-[0.5] -mx-1" />
       </template>
     </div>
   </div>

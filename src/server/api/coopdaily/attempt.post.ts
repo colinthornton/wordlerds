@@ -34,7 +34,7 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
     columns: { id: true },
     where: and(
       eq(coopDailyAttempt.gameId, data.id),
-      eq(coopDailyAttempt.userId, session.user.id)
+      eq(coopDailyAttempt.userId, session.user.id),
     ),
   });
   if (currentGameAttempt) {
@@ -75,9 +75,9 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
             count: body.wordIndex + 1,
             word: body.word,
             result,
-          }
+          },
         ),
-      }).catch((e) => console.warn(e))
+      }).catch((e) => console.warn(e)),
     );
   }
 

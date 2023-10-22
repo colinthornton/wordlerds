@@ -36,7 +36,7 @@ const canPlay = computed(
     Boolean(session.value?.user) &&
     !gameOver.value &&
     !hasPlayed.value &&
-    !attemptPending.value
+    !attemptPending.value,
 );
 
 const attemptPending = ref(false);
