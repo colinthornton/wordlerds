@@ -64,8 +64,8 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
   // send webhook
   const { webhookUrl } = useRuntimeConfig().discord;
   if (webhookUrl) {
-    try {
-      await $fetch(webhookUrl, {
+    event.context.cloudflare.context.waitUntil(
+      $fetch(webhookUrl, {
         method: "POST",
         body: getWebhookBody(
           `SQUAD MUGEN ${wordleGame.id}`,
@@ -77,10 +77,8 @@ export default defineEventHandler(async (event): Promise<WordleGameState> => {
             result,
           }
         ),
-      });
-    } catch (error) {
-      console.warn(error);
-    }
+      }).catch((e) => console.warn(e))
+    );
   }
 
   return wordleGame.state;
