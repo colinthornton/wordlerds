@@ -7,7 +7,7 @@ const props = defineProps<{
   sendUrl: "/api/coopdaily/attempt" | "/api/coopmugen/attempt";
 }>();
 
-const { data } = useFetch(props.fetchUrl);
+const { data, refresh: refreshGame } = useFetch(props.fetchUrl);
 const refresh = () => refreshNuxtData;
 onMounted(() => {
   window.addEventListener("focus", refresh);
@@ -36,7 +36,7 @@ const canPlay = computed(
     Boolean(session.value?.user) &&
     !gameOver.value &&
     !hasPlayed.value &&
-    !attemptPending.value,
+    !attemptPending.value
 );
 
 const attemptPending = ref(false);
@@ -77,7 +77,7 @@ async function sendAttempt(word: string) {
           color: "yellow",
           timeout: 2000,
         });
-        refreshNuxtData();
+        refreshGame();
         break;
       case WordleInvalidWordError.ecode:
         useToast().remove("notinwordlist");
