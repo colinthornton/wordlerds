@@ -76,7 +76,9 @@ function getKeyClass(key: string) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-2 max-w-full w-[484px] mx-auto">
+  <div
+    class="flex flex-col gap-2 max-w-full w-[484px] mx-auto touch-manipulation"
+  >
     <div
       v-for="row of keyboard"
       :key="row.join('')"
