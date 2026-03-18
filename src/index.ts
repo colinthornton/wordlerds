@@ -1,44 +1,31 @@
 import { Hono } from "hono";
-import { db } from "./db";
+import { html } from "hono/html";
+import { logger } from "hono/logger";
+import { type AuthType } from "./lib/auth";
+import { authRoutes } from "./routes/auth";
+import { oauthRoutes } from "./routes/oauth";
+import { authMiddleware } from "./middleware/auth";
 
-const app = new Hono();
-app.get("/", (c) => c.text("Hello Bun!"));
+const app = new Hono<{ Variables: AuthType }>();
 
-app.get("/users", async (c) => {
-  const users = await db.selectFrom("users").selectAll().execute();
-  return c.json(users);
+app.use(logger());
+app.use("*", authMiddleware);
+
+app.route("/api/auth", authRoutes);
+app.route("/oauth", oauthRoutes);
+
+app.get("/", (c) => {
+  const user = c.get("user");
+  if (!user) {
+    return c.html(html`<a href="/oauth/discord">Sign in with Discord</a>`);
+  }
+
+  return c.json({
+    user,
+  });
 });
 
-app.post("/users", async (c) => {
-  const body: { username: string } = await c.req.parseBody();
-  const username = body.username;
-  if (!username) return c.status(400);
-
-  await db.insertInto("users").values({ username }).execute();
-  const user = await db
-    .selectFrom("users")
-    .selectAll()
-    .where("username", "=", username)
-    .executeTakeFirstOrThrow();
-  return c.json(user);
-});
-
-app.delete("/users/:username", async (c) => {
-  const username = c.req.param("username");
-  if (!username) return c.notFound();
-
-  const user = await db
-    .selectFrom("users")
-    .selectAll()
-    .where("username", "=", username)
-    .executeTakeFirst();
-  if (!user) return c.notFound();
-
-  await db
-    .deleteFrom("users")
-    .where("id", "=", user.id)
-    .executeTakeFirstOrThrow();
-  return c.json(user);
-});
-
-export default app;
+export default {
+  port: Bun.env.PORT,
+  fetch: app.fetch,
+};
