@@ -1,22 +1,26 @@
 import { type MiddlewareHandler } from "hono";
-import { auth, type AuthType } from "../lib/auth";
+import { db } from "../db";
+import { auth } from "../lib/auth";
+import * as User from "../models/user";
 
 /**
  * Set authentication data on the context
  */
-export const authMiddleware: MiddlewareHandler<{
-  Variables: AuthType;
-}> = async (c, next) => {
+export const authMiddleware: MiddlewareHandler = async (c, next) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
 
   if (!session) {
     c.set("user", null);
-    c.set("session", null);
     await next();
     return;
   }
 
-  c.set("user", session.user);
-  c.set("session", session.session);
+  const user = await User.createOrUpdate(db, {
+    discord_user_id: session.user.discordUserId,
+    name: session.user.name,
+    avatar: session.user.image,
+  });
+  c.set("user", user);
+
   await next();
 };

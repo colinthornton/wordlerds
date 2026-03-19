@@ -12,9 +12,11 @@ export interface DB {
 
 export interface UserTable {
   id: Generated<number>;
-  created_at: ColumnType<Date, never, never>;
-  updated_at: ColumnType<Date, never, Date>;
-  username: string;
+  created_at: Generated<Date>;
+  updated_at: Generated<Date>;
+  discord_user_id: string;
+  name: string;
+  avatar: string | null;
 }
 
 export type User = Selectable<UserTable>;

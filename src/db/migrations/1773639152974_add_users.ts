@@ -10,7 +10,9 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("updated_at", "text", (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
-    .addColumn("username", "text", (col) => col.notNull().unique())
+    .addColumn("discord_user_id", "text", (col) => col.notNull().unique())
+    .addColumn("name", "text", (col) => col.notNull())
+    .addColumn("avatar", "text")
     .execute();
 }
 
