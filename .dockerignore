@@ -1,5 +1,7 @@
 node_modules
 *.sqlite*
-.env
-.env.example
+.dockerignore
+.env*
+.git
+.gitignore
 README.md
