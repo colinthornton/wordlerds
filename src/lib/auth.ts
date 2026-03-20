@@ -21,6 +21,7 @@ export const auth = betterAuth({
       disableDefaultScope: true,
       scope: ["guilds.members.read"],
       prompt: "consent",
+      overrideUserInfoOnSignIn: true,
       /**
        * Hit the guild member endpoint to ensure we only allow members of the Ussie guild
        */
@@ -31,7 +32,7 @@ export const auth = betterAuth({
         ).then((res) => res.json());
 
         // https://docs.discord.com/developers/resources/guild#guild-member-object
-        const { success, data: guildMember } = z
+        const { success: isGuildMember, data: guildMember } = z
           .object({
             nick: z.string().nullable(),
             avatar: z.string().nullable(),
@@ -43,7 +44,7 @@ export const auth = betterAuth({
             }),
           })
           .safeParse(maybeGuildMember);
-        if (!success) {
+        if (!isGuildMember) {
           throw new HTTPException(403, { message: "Only Ussies Allowed" });
         }
 

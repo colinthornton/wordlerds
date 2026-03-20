@@ -4,7 +4,7 @@ import { auth } from "../lib/auth";
 import * as User from "../models/user";
 
 /**
- * Set authentication data on the context
+ * Set login user data on the context
  */
 export const authMiddleware: MiddlewareHandler = async (c, next) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });

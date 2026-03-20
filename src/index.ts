@@ -1,27 +1,40 @@
 import { Hono } from "hono";
-import { html } from "hono/html";
 import { logger } from "hono/logger";
 import type { User } from "./db/schema";
 import { authMiddleware } from "./middleware/auth";
 import { authRoutes } from "./routes/auth";
-import { oauthRoutes } from "./routes/oauth";
+import { serveStatic } from "hono/bun";
+import { rootView } from "./views/root";
+import { signInView } from "./views/sign-in";
 
-const app = new Hono<{ Variables: { user: User | null } }>();
+const app = new Hono().use(logger());
 
-app.use(logger());
-app.use("*", authMiddleware);
+const publicRoutes = new Hono()
+  .route("/api/auth", authRoutes)
+  .get("/public/*", serveStatic({ root: "./" }));
+app.route("/", publicRoutes);
 
-app.route("/api/auth", authRoutes);
-app.route("/oauth", oauthRoutes);
+const unguardedRoutes = new Hono<{ Variables: { user: User | null } }>()
+  .use(authMiddleware)
+  .get("/sign-in", (c) => {
+    if (c.get("user")) {
+      return c.redirect("/");
+    }
 
-app.get("/", (c) => {
-  const user = c.get("user");
-  if (!user) {
-    return c.html(html`<a href="/oauth/discord">Sign in with Discord</a>`);
-  }
+    return c.html(signInView());
+  });
+app.route("/", unguardedRoutes);
 
-  return c.html(html`<pre><code>${JSON.stringify(user, null, 2)}</code></pre>`);
-});
+const guardedRoutes = new Hono<{ Variables: { user: User } }>()
+  .use(authMiddleware)
+  .use(async (c, next) => {
+    if (!c.get("user")) {
+      return c.redirect("/sign-in");
+    }
+    await next();
+  })
+  .get("/", (c) => c.html(rootView(c.var.user)));
+app.route("/", guardedRoutes);
 
 export default {
   port: Bun.env.PORT,
