@@ -18,7 +18,8 @@ COPY --from=install /temp/prod/node_modules node_modules
 COPY . .
 
 # run the app
+RUN chown -R 1000:1000 /usr/src/app/sqlite
 USER bun
 EXPOSE 3000/tcp
-VOLUME ["./sqlite:/usr/src/sqlite"]
+VOLUME ["./sqlite:/usr/src/app/sqlite"]
 ENTRYPOINT [ "bun", "run", "src/index.ts" ]
