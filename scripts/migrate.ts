@@ -1,7 +1,7 @@
 import { FileMigrationProvider, Migrator } from "kysely";
 import { promises as fs } from "node:fs";
 import * as path from "node:path";
-import { db } from "./index";
+import { db } from "../src/db/index";
 
 // Mostly copied from Kysely docs
 // https://kysely.dev/docs/migrations#running-migrations

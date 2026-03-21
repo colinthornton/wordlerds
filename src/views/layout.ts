@@ -9,6 +9,7 @@ export const layout = (body: string | ReturnType<typeof html>) =>
         <link rel="icon" href="/public/icon.png" />
         <title>Wordlerds</title>
         <script type="module" src="/public/wordlerds.js"></script>
+        <link rel="stylesheet" href="/public/wordlerds.css" />
       </head>
       <body>
         ${body}

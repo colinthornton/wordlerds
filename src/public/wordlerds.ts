@@ -1,5 +1,6 @@
 document.querySelector("#sign-in")?.addEventListener("click", async (e) => {
-  e.target.disabled = true;
+  const button = e.target as HTMLButtonElement;
+  button.disabled = true;
 
   const res = await fetch("/api/auth/sign-in/social", {
     method: "POST",
@@ -12,11 +13,12 @@ document.querySelector("#sign-in")?.addEventListener("click", async (e) => {
   }
 
   console.error(message);
-  e.target.disabled = false;
+  button.disabled = false;
 });
 
 document.querySelector("#sign-out")?.addEventListener("click", async (e) => {
-  e.target.disabled = true;
+  const button = e.target as HTMLButtonElement;
+  button.disabled = true;
 
   const res = await fetch("/api/auth/sign-out", {
     method: "POST",
@@ -29,5 +31,5 @@ document.querySelector("#sign-out")?.addEventListener("click", async (e) => {
   }
 
   console.error(message);
-  e.target.disabled = false;
+  button.disabled = false;
 });
