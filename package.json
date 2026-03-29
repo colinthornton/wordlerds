@@ -4,6 +4,9 @@
     "dev:server": "bun run --hot src/index.ts",
     "dev:tailwind": "bun run -- tailwindcss -i src/public/wordlerds.css -o public/wordlerds.css --watch",
     "dev:static": "bun build src/public/*.{png,ts} --outdir public/ --asset-naming=[name].[ext] --watch",
+    "build": "bun run --parallel build:tailwind build:static",
+    "build:tailwind": "bun run -- tailwindcss -i src/public/wordlerds.css -o public/wordlerds.css",
+    "build:static": "bun build src/public/*.{png,ts} --outdir public/ --asset-naming=[name].[ext]",
     "db": "bun run --bun kysely",
     "migrate:latest": "bun run scripts/migrate.ts"
   },
@@ -18,7 +21,6 @@
     "@tailwindcss/cli": "^4.2.2",
     "@types/bun": "^1.3.11",
     "basecoat-css": "^0.3.11",
-    "bun-plugin-tailwind": "^0.1.2",
     "concurrently": "^9.2.1",
     "kysely-ctl": "^0.20.0",
     "tailwindcss": "^4.2.2"
