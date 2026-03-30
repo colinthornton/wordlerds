@@ -33,7 +33,7 @@ const guardedRoutes = new Hono<{ Variables: { user: User } }>()
     }
     await next();
   })
-  .get("/", (c) => c.html(rootView(c.var.user)));
+  .get("/", (c) => c.html(rootView({ user: c.var.user })));
 app.route("/", guardedRoutes);
 
 export default {

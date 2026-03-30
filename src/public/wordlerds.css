@@ -1,2 +1,9 @@
 @import "tailwindcss";
 @import "basecoat-css";
+
+:root.dark {
+  --background: #1c1b22;
+  --foreground: #fbfbfe;
+  --primary: #84cc16;
+  --secondary: #facc15;
+}

@@ -1,8 +1,12 @@
 import { html } from "hono/html";
+import type { User } from "../db/schema";
 
-export const layout = (body: string | ReturnType<typeof html>) =>
+export const layout = (props: {
+  user: User | null;
+  body: ReturnType<typeof html>;
+}) =>
   html`<!DOCTYPE html>
-    <html lang="en">
+    <html lang="en" class="dark">
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,7 +15,24 @@ export const layout = (body: string | ReturnType<typeof html>) =>
         <script type="module" src="/public/wordlerds.js"></script>
         <link rel="stylesheet" href="/public/wordlerds.css" />
       </head>
-      <body>
-        ${body}
+      <body class="min-h-svh">
+        <main>
+          <header class="h-10 border-b border-b-neutral-700">
+            <div
+              class="mx-auto max-w-xl h-full px-4 flex justify-between items-center"
+            >
+              ${props.user
+                ? html`<img
+                    class="size-8 shrink-0 object-cover rounded-full"
+                    alt="${props.user.name}"
+                    src="${props.user.avatar}"
+                  />`
+                : html`<div class="size-8 shrink-0"></div>`}
+              <h1 class="font-bold uppercase">Wordlerds</h1>
+              <div class="size-8 shrink-0"></div>
+            </div>
+          </header>
+          ${props.body}
+        </main>
       </body>
     </html>`;
