@@ -2,8 +2,9 @@
 @import "basecoat-css";
 
 @theme {
-  --color-correct: #84cc16;
+  --color-not-present: #262626;
   --color-present: #facc15;
+  --color-correct: #84cc16;
 }
 
 :root.dark {

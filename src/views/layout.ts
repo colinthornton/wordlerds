@@ -15,24 +15,22 @@ export const layout = (props: {
         <script type="module" src="/public/wordlerds.js"></script>
         <link rel="stylesheet" href="/public/wordlerds.css" />
       </head>
-      <body class="min-h-svh">
-        <main>
-          <header class="h-10 border-b border-b-neutral-700">
-            <div
-              class="mx-auto max-w-xl h-full px-4 flex justify-between items-center"
-            >
-              ${props.user
-                ? html`<img
-                    class="size-8 shrink-0 object-cover rounded-full"
-                    alt="${props.user.name}"
-                    src="${props.user.avatar}"
-                  />`
-                : html`<div class="size-8 shrink-0"></div>`}
-              <h1 class="font-bold uppercase">Wordlerds</h1>
-              <div class="size-8 shrink-0"></div>
-            </div>
-          </header>
-          ${props.body}
-        </main>
+      <body>
+        <header class="h-10 border-b border-b-neutral-700">
+          <div
+            class="mx-auto max-w-xl h-full px-4 flex justify-between items-center"
+          >
+            ${props.user
+              ? html`<img
+                  class="size-8 shrink-0 object-cover rounded-full"
+                  alt="${props.user.name}"
+                  src="${props.user.avatar}"
+                />`
+              : html`<div class="size-8 shrink-0"></div>`}
+            <h1 class="font-bold uppercase">Wordlerds</h1>
+            <div class="size-8 shrink-0"></div>
+          </div>
+        </header>
+        <main class="flex flex-col items-center">${props.body}</main>
       </body>
     </html>`;

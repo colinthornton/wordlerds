@@ -6,6 +6,7 @@ import { authRoutes } from "./routes/auth";
 import { serveStatic } from "hono/bun";
 import { rootView } from "./views/root";
 import { signInView } from "./views/sign-in";
+import { Wordle } from "./lib/wordle";
 
 const app = new Hono().use(logger());
 
@@ -33,7 +34,10 @@ const guardedRoutes = new Hono<{ Variables: { user: User } }>()
     }
     await next();
   })
-  .get("/", (c) => c.html(rootView({ user: c.var.user })));
+  .get("/", (c) => {
+    const game = new Wordle("groan", ["grown"]);
+    return c.html(rootView({ user: c.var.user, letters: game.letters }));
+  });
 app.route("/", guardedRoutes);
 
 export default {
