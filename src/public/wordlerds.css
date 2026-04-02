@@ -1,9 +1,12 @@
 @import "tailwindcss";
 @import "basecoat-css";
 
+@theme {
+  --color-correct: #84cc16;
+  --color-present: #facc15;
+}
+
 :root.dark {
   --background: #1c1b22;
   --foreground: #fbfbfe;
-  --primary: #84cc16;
-  --secondary: #facc15;
 }
