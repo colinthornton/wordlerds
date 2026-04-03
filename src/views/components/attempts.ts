@@ -1,9 +1,7 @@
 import { html } from "hono/html";
-import { WordleLetter } from "../../lib/wordle";
+import { Feedback, type Attempt } from "../../lib/wordle";
 
-export const attempts = (props: {
-  attempts: { word: string; result: WordleLetter[] }[];
-}) => {
+export const attempts = (props: { attempts: Attempt[] }) => {
   return html`<div
     class="grid grid-rows-6 gap-1.5 max-w-full w-87.5 h-105 my-8"
   >
@@ -11,31 +9,31 @@ export const attempts = (props: {
   </div>`;
 };
 
-const row = (attempt: { word: string; result: WordleLetter[] }) => {
-  const letters = attempt.result.map((result, i) => ({
+const row = (attempt: Attempt) => {
+  const letters = attempt.feedback.map((feedback, i) => ({
     letter: attempt.word[i] as string,
-    result,
+    feedback,
   }));
 
   return html`<div class="grid grid-cols-5 gap-1.5">${letters.map(box)}</div>`;
 };
 
-const box = (props: { letter: string; result: WordleLetter }) =>
+const box = (props: { letter: string; feedback: Feedback }) =>
   html`<div
     class="grid place-items-center border-2 border-neutral-700 text-3xl font-bold uppercase ${boxColor(
-      props.result,
+      props.feedback,
     )}"
   >
     ${props.letter}
   </div>`;
 
-const boxColor = (result: WordleLetter) => {
-  switch (result) {
-    case WordleLetter.NotPresent:
+const boxColor = (feedback: Feedback) => {
+  switch (feedback) {
+    case Feedback.NotPresent:
       return "bg-natural-800";
-    case WordleLetter.Present:
+    case Feedback.Present:
       return "bg-present text-primary-foreground";
-    case WordleLetter.Correct:
+    case Feedback.Correct:
       return "bg-correct text-primary-foreground";
     default:
       return "";

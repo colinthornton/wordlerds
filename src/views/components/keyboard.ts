@@ -1,7 +1,7 @@
 import { html } from "hono/html";
-import { WordleLetter } from "../../lib/wordle";
+import { Feedback } from "../../lib/wordle";
 
-export const keyboard = (props: { letters: Record<string, WordleLetter> }) =>
+export const keyboard = (props: { letters: Record<string, Feedback> }) =>
   html`<div class="flex flex-col gap-2 w-full max-w-121 touch-manipulation">
     ${keys.map(
       (row) =>
@@ -17,7 +17,7 @@ const keys = [
   ["Enter", "z", "x", "c", "v", "b", "n", "m", "Backspace"],
 ];
 
-const button = (key: string, letters: Record<string, WordleLetter>) => {
+const button = (key: string, letters: Record<string, Feedback>) => {
   switch (key) {
     case "":
       return html`<div class="flex-[0.5] -mx-1"></div>`;
@@ -66,13 +66,13 @@ const button = (key: string, letters: Record<string, WordleLetter>) => {
     default:
       let color = "";
       switch (letters[key]) {
-        case WordleLetter.NotPresent:
+        case Feedback.NotPresent:
           color = "bg-not-present text-secondary-foreground";
           break;
-        case WordleLetter.Present:
+        case Feedback.Present:
           color = "bg-present";
           break;
-        case WordleLetter.Correct:
+        case Feedback.Correct:
           color = "bg-correct";
           break;
       }

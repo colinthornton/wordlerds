@@ -3,15 +3,15 @@ export class WordNotInSolutionsError extends Error {}
 export class WordNotInDictionaryError extends Error {}
 export class HardModeError extends Error {}
 
-export const enum WordleLetter {
+export const enum Feedback {
   NotPresent = 0,
   Present = 1,
   Correct = 2,
 }
 
-interface Attempt {
+export interface Attempt {
   word: string;
-  result: WordleLetter[];
+  feedback: Feedback[];
 }
 
 export class Wordle {
@@ -26,12 +26,12 @@ export class Wordle {
   }
 
   get letters() {
-    const letters: Record<string, WordleLetter> = {};
+    const letters: Record<string, Feedback> = {};
     for (const attempt of this.attempts) {
       for (let i = 0; i < attempt.word.length; i++) {
         const letter = attempt.word[i] as string;
-        letters[letter] ??= WordleLetter.NotPresent;
-        letters[letter] = Math.max(letters[letter], attempt.result[i]!);
+        letters[letter] ??= Feedback.NotPresent;
+        letters[letter] = Math.max(letters[letter], attempt.feedback[i]!);
       }
     }
     return letters;
@@ -57,29 +57,26 @@ export class Wordle {
       throw new WordNotInDictionaryError();
     }
 
-    const lastAttempt = this.attempts.at(-1);
-    if (lastAttempt) {
-      this.validateHardMode(word, lastAttempt);
+    const prevAttempt = this.attempts.at(-1);
+    if (prevAttempt) {
+      this.validateHardMode(word, prevAttempt);
     }
 
-    this.attempts.push({ word, result: this.getResult(word) });
+    this.attempts.push({ word, feedback: this.getFeedback(word) });
   }
 
-  private validateHardMode(word: string, lastAttempt: Attempt) {
+  private validateHardMode(word: string, prevAttempt: Attempt) {
     const presentCounts: Record<string, number> = {};
 
-    for (let i = 0; i < lastAttempt.word.length; i++) {
-      const letter = lastAttempt.word[i] as string;
+    for (let i = 0; i < prevAttempt.word.length; i++) {
+      const letter = prevAttempt.word[i] as string;
 
       // must play correct letters in same spot
-      if (
-        lastAttempt.result[i] === WordleLetter.Correct &&
-        word[i] !== letter
-      ) {
+      if (prevAttempt.feedback[i] === Feedback.Correct && word[i] !== letter) {
         throw new HardModeError();
       }
 
-      if (lastAttempt.result[i] === WordleLetter.NotPresent) continue;
+      if (prevAttempt.feedback[i] === Feedback.NotPresent) continue;
 
       presentCounts[letter] ??= 0;
       presentCounts[letter]++;
@@ -96,7 +93,7 @@ export class Wordle {
     }
   }
 
-  private getResult(word: string) {
+  private getFeedback(word: string) {
     // map letters in solution to how many times they appear
     const counts: Record<string, number> = {};
     for (const letter of this.solution) {
@@ -104,23 +101,23 @@ export class Wordle {
       counts[letter]++;
     }
 
-    const result: WordleLetter[] = new Array(word.length);
+    const feedback: Feedback[] = new Array(word.length);
     for (let i = 0; i < word.length; i++) {
       const letter = word[i] as string;
 
       if (!counts[letter]) {
-        result[i] = WordleLetter.NotPresent;
+        feedback[i] = Feedback.NotPresent;
         continue;
       }
 
       counts[letter]--;
       if (letter === this.solution[i]) {
-        result[i] = WordleLetter.Correct;
+        feedback[i] = Feedback.Correct;
       } else {
-        result[i] = WordleLetter.Present;
+        feedback[i] = Feedback.Present;
       }
     }
-    return result;
+    return feedback;
   }
 }
 

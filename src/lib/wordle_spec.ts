@@ -2,7 +2,7 @@ import { expect, test, describe } from "bun:test";
 import {
   HardModeError,
   Wordle,
-  WordleLetter,
+  Feedback,
   WordNotInDictionaryError,
   WordNotInSolutionsError,
 } from "./wordle";
@@ -47,7 +47,7 @@ describe("#gameOver", () => {
   });
 });
 
-describe("results", () => {
+describe("feedback", () => {
   test("finds solution", () => {
     const game = new Wordle("guess");
     game.makeAttempt("guess");
@@ -55,12 +55,12 @@ describe("results", () => {
     expect(game.attempts).toEqual([
       {
         word: "guess",
-        result: [
-          WordleLetter.Correct,
-          WordleLetter.Correct,
-          WordleLetter.Correct,
-          WordleLetter.Correct,
-          WordleLetter.Correct,
+        feedback: [
+          Feedback.Correct,
+          Feedback.Correct,
+          Feedback.Correct,
+          Feedback.Correct,
+          Feedback.Correct,
         ],
       },
     ]);
@@ -73,12 +73,12 @@ describe("results", () => {
     expect(game.attempts).toEqual([
       {
         word: "llama",
-        result: [
-          WordleLetter.Present,
-          WordleLetter.Present,
-          WordleLetter.NotPresent,
-          WordleLetter.NotPresent,
-          WordleLetter.NotPresent,
+        feedback: [
+          Feedback.Present,
+          Feedback.Present,
+          Feedback.NotPresent,
+          Feedback.NotPresent,
+          Feedback.NotPresent,
         ],
       },
     ]);

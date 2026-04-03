@@ -1,14 +1,14 @@
 import { html } from "hono/html";
 import type { User } from "../db/schema";
-import { layout } from "./layout";
-import { keyboard } from "./components/keyboard";
-import type { WordleLetter } from "../lib/wordle";
+import type { Attempt, Feedback } from "../lib/wordle";
 import { attempts } from "./components/attempts";
+import { keyboard } from "./components/keyboard";
+import { layout } from "./layout";
 
 export const rootView = (props: {
   user: User;
-  attempts: { word: string; result: WordleLetter[] }[];
-  letters: Record<string, WordleLetter>;
+  attempts: Attempt[];
+  letters: Record<string, Feedback>;
 }) =>
   layout({
     user: props.user,
