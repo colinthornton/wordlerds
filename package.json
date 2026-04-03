@@ -3,14 +3,15 @@
     "dev": "bun run concurrently 'bun dev:server' 'bun dev:tailwind' 'bun dev:static'",
     "dev:server": "bun run --hot src/index.ts",
     "dev:tailwind": "bun run -- tailwindcss -i src/public/wordlerds.css -o public/wordlerds.css --watch",
-    "dev:static": "bun build src/public/*.{png,ts} --outdir public/ --asset-naming=[name].[ext] --watch",
+    "dev:static": "WATCH= scripts/build_static.sh",
     "build": "bun run --parallel build:tailwind build:static",
     "build:tailwind": "bun run -- tailwindcss -i src/public/wordlerds.css -o public/wordlerds.css",
-    "build:static": "bun build src/public/*.{png,ts} --outdir public/ --asset-naming=[name].[ext]",
+    "build:static": "scripts/build_static.sh",
     "db": "bun run --bun kysely",
     "migrate:latest": "bun run scripts/migrate.ts"
   },
   "dependencies": {
+    "@starfederation/datastar-sdk": "^1.0.0-RC.3",
     "better-auth": "^1.5.6",
     "hono": "^4.12.10",
     "kysely": "^0.28.15",

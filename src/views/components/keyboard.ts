@@ -2,7 +2,10 @@ import { html } from "hono/html";
 import { Feedback } from "../../lib/wordle";
 
 export const keyboard = (props: { letters: Record<string, Feedback> }) =>
-  html`<div class="flex flex-col gap-2 w-full max-w-121 touch-manipulation">
+  html`<div
+    id="keyboard"
+    class="flex flex-col gap-2 w-full max-w-121 touch-manipulation"
+  >
     ${keys.map(
       (row) =>
         html`<div class="flex gap-2 justify-center">
@@ -24,6 +27,7 @@ const button = (key: string, letters: Record<string, Feedback>) => {
     case "Enter":
       return html`<button
         class="btn-icon flex-[1.5] uppercase font-bold h-14 p-0 text-[20px]"
+        data-on:pointerdown="@post('/attempts')"
       >
         <svg
           class="size-5"
@@ -45,6 +49,7 @@ const button = (key: string, letters: Record<string, Feedback>) => {
     case "Backspace":
       return html`<button
         class="btn-icon flex-[1.5] uppercase font-bold h-14 p-0"
+        data-on:pointerdown="$word = $word.length === 0 ? $word : $word.slice(0, -1)"
       >
         <svg
           class="size-5"
@@ -78,6 +83,7 @@ const button = (key: string, letters: Record<string, Feedback>) => {
       }
       return html`<button
         class="btn flex-1 uppercase font-bold h-14 p-0 ${color}"
+        data-on:pointerdown="$word = $word.length < 5 ? $word + '${key}' : $word"
       >
         ${key}
       </button>`;

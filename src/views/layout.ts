@@ -12,8 +12,9 @@ export const layout = (props: {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" href="/public/icon.png" />
         <title>Wordlerds</title>
-        <script type="module" src="/public/wordlerds.js"></script>
         <link rel="stylesheet" href="/public/wordlerds.css" />
+        <script type="module" src="/public/vendor/datastar.js"></script>
+        <script type="module" src="/public/wordlerds.js"></script>
       </head>
       <body>
         <header class="h-10 border-b border-b-neutral-700">
