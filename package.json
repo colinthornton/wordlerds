@@ -11,9 +11,9 @@
     "migrate:latest": "bun run scripts/migrate.ts"
   },
   "dependencies": {
-    "better-auth": "^1.5.5",
-    "hono": "^4.12.8",
-    "kysely": "^0.28.13",
+    "better-auth": "^1.5.6",
+    "hono": "^4.12.10",
+    "kysely": "^0.28.15",
     "kysely-bun-sqlite": "^0.4.0",
     "zod": "^4.3.6"
   },
