@@ -2,9 +2,7 @@ import { html } from "hono/html";
 import { WordleLetter } from "../../lib/wordle";
 
 export const keyboard = (props: { letters: Record<string, WordleLetter> }) =>
-  html`<div
-    class="flex flex-col gap-2 w-full max-w-121 px-2 touch-manipulation"
-  >
+  html`<div class="flex flex-col gap-2 w-full max-w-121 touch-manipulation">
     ${keys.map(
       (row) =>
         html`<div class="flex gap-2 justify-center">

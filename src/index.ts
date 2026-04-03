@@ -35,8 +35,14 @@ const guardedRoutes = new Hono<{ Variables: { user: User } }>()
     await next();
   })
   .get("/", (c) => {
-    const game = new Wordle("groan", ["grown"]);
-    return c.html(rootView({ user: c.var.user, letters: game.letters }));
+    const game = new Wordle("groan", ["wrong"]);
+    return c.html(
+      rootView({
+        user: c.var.user,
+        attempts: game.attempts,
+        letters: game.letters,
+      }),
+    );
   });
 app.route("/", guardedRoutes);
 

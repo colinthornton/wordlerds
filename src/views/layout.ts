@@ -31,6 +31,6 @@ export const layout = (props: {
             <div class="size-8 shrink-0"></div>
           </div>
         </header>
-        <main class="flex flex-col items-center">${props.body}</main>
+        <main class="flex flex-col items-center px-2">${props.body}</main>
       </body>
     </html>`;
