@@ -79,10 +79,10 @@ export class Wordle {
         throw new HardModeError();
       }
 
-      if (lastAttempt.result[i] === WordleLetter.Present) {
-        presentCounts[letter] ??= 0;
-        presentCounts[letter]++;
-      }
+      if (lastAttempt.result[i] === WordleLetter.NotPresent) continue;
+
+      presentCounts[letter] ??= 0;
+      presentCounts[letter]++;
     }
 
     for (let i = 0; i < word.length; i++) {

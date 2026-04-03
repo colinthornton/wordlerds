@@ -118,5 +118,11 @@ describe("errors", () => {
       expect(() => game.makeAttempt("lever")).toThrow(HardModeError);
       expect(() => game.makeAttempt("level")).not.toThrow();
     });
+
+    test("must play all present letters when one is correct", () => {
+      const game = new Wordle("droll", ["level"]);
+
+      expect(() => game.makeAttempt("panel")).toThrow(HardModeError);
+    });
   });
 });
