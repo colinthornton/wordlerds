@@ -106,21 +106,22 @@ export class Wordle {
       counts[letter]++;
     }
 
-    const feedback: Feedback[] = new Array(word.length);
+    const feedback: Feedback[] = new Array(word.length).fill(
+      Feedback.NotPresent,
+    );
     for (let i = 0; i < word.length; i++) {
       const letter = word[i] as string;
-
-      if (!counts[letter]) {
-        feedback[i] = Feedback.NotPresent;
-        continue;
-      }
-
+      if (!counts[letter]) continue;
+      if (letter !== this.solution[i]) continue;
+      feedback[i] = Feedback.Correct;
       counts[letter]--;
-      if (letter === this.solution[i]) {
-        feedback[i] = Feedback.Correct;
-      } else {
-        feedback[i] = Feedback.Present;
-      }
+    }
+    for (let i = 0; i < word.length; i++) {
+      const letter = word[i] as string;
+      if (!counts[letter]) continue;
+      if (feedback[i] === Feedback.Correct) continue;
+      feedback[i] = Feedback.Present;
+      counts[letter]--;
     }
     return feedback;
   }

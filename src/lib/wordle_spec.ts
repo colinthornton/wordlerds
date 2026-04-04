@@ -83,6 +83,19 @@ describe("feedback", () => {
       },
     ]);
   });
+
+  test("correct come after same letter", () => {
+    // edge case: in testing I had "toast" show up with the first "T" marked present and the final "T" marked not present
+    const game = new Wordle("coast", ["prime", "lousy", "toast"]);
+
+    expect(game.attempts.at(-1)!.feedback).toEqual([
+      Feedback.NotPresent,
+      Feedback.Correct,
+      Feedback.Correct,
+      Feedback.Correct,
+      Feedback.Correct,
+    ]);
+  });
 });
 
 describe("errors", () => {
