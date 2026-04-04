@@ -1,12 +1,12 @@
 {
   "scripts": {
-    "dev": "bun run concurrently 'bun dev:server' 'bun dev:tailwind' 'bun dev:static'",
+    "dev": "bun run concurrently 'bun dev:server' 'bun dev:css' 'bun dev:js'",
     "dev:server": "bun run --hot src/index.ts",
-    "dev:tailwind": "bun run -- tailwindcss -i src/public/wordlerds.css -o public/wordlerds.css --watch",
-    "dev:static": "WATCH= scripts/build_static.sh",
-    "build": "bun run --parallel build:tailwind build:static",
-    "build:tailwind": "bun run -- tailwindcss -i src/public/wordlerds.css -o public/wordlerds.css",
-    "build:static": "scripts/build_static.sh",
+    "dev:css": "bun run tailwindcss -i src/public/wordlerds.css -o public/wordlerds.css --watch",
+    "dev:js": "bun build src/public/wordlerds.ts --outdir public/ --watch",
+    "build": "bun run --parallel build:css build:js",
+    "build:css": "bun run tailwindcss -i src/public/wordlerds.css -o public/wordlerds.css",
+    "build:js": "bun build src/public/wordlerds.ts --outdir public/",
     "db": "bun run --bun kysely",
     "migrate:latest": "bun run scripts/migrate.ts"
   },
