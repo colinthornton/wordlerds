@@ -11,7 +11,7 @@ async function migrateToLatest() {
     provider: new FileMigrationProvider({
       fs,
       path,
-      migrationFolder: path.resolve(__dirname, "migrations"),
+      migrationFolder: path.resolve(__dirname, "../src/db/migrations"),
     }),
   });
 
