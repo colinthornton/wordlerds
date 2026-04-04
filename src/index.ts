@@ -5,11 +5,21 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { z } from "zod";
 import type { User } from "./db/schema";
-import { solutions, Wordle } from "./lib/wordle";
+import {
+  HardModeError,
+  solutions,
+  Wordle,
+  WordNotInDictionaryError,
+} from "./lib/wordle";
 import { authMiddleware } from "./middleware/auth";
 import { authRoutes } from "./routes/auth";
 import { attempts } from "./views/components/attempts";
 import { keyboard } from "./views/components/keyboard";
+import {
+  hardModeToast,
+  notInDictionaryToast,
+  toast,
+} from "./views/components/toasts";
 import { rootView } from "./views/root";
 import { signInView } from "./views/sign-in";
 
@@ -62,9 +72,39 @@ const guardedRoutes = new Hono<{ Variables: { user: User } }>()
     }
     const signals = maybeSignals.data;
 
-    game.makeAttempt(signals.word);
+    try {
+      game.makeAttempt(signals.word);
+    } catch (error) {
+      if (error instanceof WordNotInDictionaryError) {
+        return ServerSentEventGenerator.stream((s) => {
+          s.patchElements(notInDictionaryToast(signals.word).toString(), {
+            selector: "#toaster",
+            mode: "append",
+          });
+        });
+      }
+
+      if (error instanceof HardModeError) {
+        return ServerSentEventGenerator.stream((s) => {
+          s.patchElements(hardModeToast().toString(), {
+            selector: "#toaster",
+            mode: "append",
+          });
+        });
+      }
+    }
 
     return ServerSentEventGenerator.stream((s) => {
+      if (game.gameOver) {
+        s.patchElements(
+          toast({
+            title: `"${game.attempts.at(-1)!.word}" was correct!`,
+            emoji: "966369258735038524",
+          }).toString(),
+          { selector: "#toaster", mode: "append" },
+        );
+        newWordle();
+      }
       s.patchSignals(JSON.stringify({ word: "" }));
       s.patchElements(attempts({ attempts: game.attempts }).toString());
       s.patchElements(keyboard({ letters: game.letters }).toString());

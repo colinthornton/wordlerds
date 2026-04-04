@@ -1,7 +1,8 @@
-export class GameOverError extends Error {}
-export class WordNotInSolutionsError extends Error {}
-export class WordNotInDictionaryError extends Error {}
-export class HardModeError extends Error {}
+export class WordleError extends Error {}
+export class GameOverError extends WordleError {}
+export class WordNotInSolutionsError extends WordleError {}
+export class WordNotInDictionaryError extends WordleError {}
+export class HardModeError extends WordleError {}
 
 export const enum Feedback {
   NotPresent = 0,

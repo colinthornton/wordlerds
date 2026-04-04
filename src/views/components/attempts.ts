@@ -33,7 +33,7 @@ const box = (props: { letter: string; feedback: Feedback }) =>
 const boxColor = (feedback: Feedback) => {
   switch (feedback) {
     case Feedback.NotPresent:
-      return "bg-natural-800";
+      return "bg-neutral-800";
     case Feedback.Present:
       return "bg-present text-primary-foreground";
     case Feedback.Correct:

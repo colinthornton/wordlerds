@@ -33,5 +33,6 @@ export const layout = (props: {
           </div>
         </header>
         <main class="flex flex-col items-center px-2">${props.body}</main>
+        <div id="toaster" class="toaster bottom-[unset] top-0"></div>
       </body>
     </html>`;
