@@ -95,14 +95,21 @@ const guardedRoutes = new Hono<{ Variables: { user: User } }>()
     }
 
     return ServerSentEventGenerator.stream((s) => {
-      if (game.gameOver) {
-        s.patchElements(
-          toast({
-            title: `"${game.attempts.at(-1)!.word}" was correct!`,
-            emoji: "966369258735038524",
-          }).toString(),
-          { selector: "#toaster", mode: "append" },
-        );
+      if (game.state !== "IN_PROGRESS") {
+        const toastOptions =
+          game.state === "WIN"
+            ? {
+                title: `"${signals.word}" was correct!`,
+                emoji: "966369258735038524",
+              }
+            : {
+                title: `The word was "${game.solution}"`,
+                emoji: "1139222642226900992",
+              };
+        s.patchElements(toast(toastOptions).toString(), {
+          selector: "#toaster",
+          mode: "append",
+        });
         newWordle();
       }
       s.patchSignals(JSON.stringify({ word: "" }));

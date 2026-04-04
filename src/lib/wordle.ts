@@ -16,14 +16,18 @@ export interface Attempt {
 }
 
 export class Wordle {
-  attempts: Attempt[] = [];
+  readonly attempts: Attempt[] = [];
+
+  get state() {
+    const lastAttempt = this.attempts.at(-1);
+    if (!lastAttempt) return "IN_PROGRESS";
+    if (lastAttempt.word === this.solution) return "WIN";
+    if (this.attempts.length === 6) return "LOSE";
+    return "IN_PROGRESS";
+  }
 
   get gameOver() {
-    if (this.attempts.length === 6) return true;
-
-    const lastAttempt = this.attempts.at(-1);
-    if (!lastAttempt) return false;
-    return lastAttempt.word === this.solution;
+    return this.state !== "IN_PROGRESS";
   }
 
   get letters() {
@@ -39,7 +43,7 @@ export class Wordle {
   }
 
   constructor(
-    private solution: string,
+    readonly solution: string,
     attempts: string[] = [],
   ) {
     if (!solutions.has(solution)) {
