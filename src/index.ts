@@ -12,6 +12,7 @@ import {
   WordNotInDictionaryError,
 } from "./lib/wordle";
 import { authMiddleware } from "./middleware/auth";
+import { signInGuard } from "./middleware/sign_in_guard";
 import { authRoutes } from "./routes/auth";
 import { attempts } from "./views/components/attempts";
 import { keyboard } from "./views/components/keyboard";
@@ -23,32 +24,19 @@ import {
 import { rootView } from "./views/root";
 import { signInView } from "./views/sign-in";
 
-const app = new Hono().use(logger());
-
-const publicRoutes = new Hono()
+const app = new Hono()
+  .use(logger())
   .route("/api/auth", authRoutes)
-  .get("/public/*", serveStatic({ root: "./" }));
-app.route("/", publicRoutes);
-
-const unguardedRoutes = new Hono<{ Variables: { user: User | null } }>()
-  .use(authMiddleware)
+  .get("/public/*", serveStatic({ root: "./" }))
+  .use<{ Variables: { user: User | null } }>(authMiddleware)
   .get("/sign-in", (c) => {
-    if (c.get("user")) {
+    if (c.var.user) {
       return c.redirect("/");
     }
 
     return c.html(signInView());
-  });
-app.route("/", unguardedRoutes);
-
-const guardedRoutes = new Hono<{ Variables: { user: User } }>()
-  .use(authMiddleware)
-  .use(async (c, next) => {
-    if (!c.get("user")) {
-      return c.redirect("/sign-in");
-    }
-    await next();
   })
+  .use<{ Variables: { user: User } }>(signInGuard)
   .get("/", (c) => {
     return c.html(
       rootView({
@@ -64,13 +52,12 @@ const guardedRoutes = new Hono<{ Variables: { user: User } }>()
       throw new HTTPException(500);
     }
 
-    const maybeSignals = z
+    const { success: signalsValid, data: signals } = z
       .object({ word: z.string() })
       .safeParse(reader.signals);
-    if (!maybeSignals.success) {
+    if (!signalsValid) {
       throw new HTTPException(400);
     }
-    const signals = maybeSignals.data;
 
     try {
       game.makeAttempt(signals.word);
@@ -117,12 +104,11 @@ const guardedRoutes = new Hono<{ Variables: { user: User } }>()
       s.patchElements(keyboard({ letters: game.letters }).toString());
     });
   });
-app.route("/", guardedRoutes);
 
-export default {
+const server = Bun.serve({
   port: Bun.env.PORT,
   fetch: app.fetch,
-};
+});
 
 // temporary for testing
 let game: Wordle;
