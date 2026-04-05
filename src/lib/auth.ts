@@ -45,25 +45,31 @@ export const auth = betterAuth({
           })
           .safeParse(maybeGuildMember);
         if (!isGuildMember) {
+          console.log("Guild member object failed validation");
+          console.log(JSON.stringify(maybeGuildMember, null, 2));
           throw new HTTPException(403, { message: "Only Ussies Allowed" });
         }
 
+        const user = {
+          id: guildMember.user.id, // this gets overwritten for some reason, use discordUserId
+          email: `${guildMember.user.id}@discord.com`, // I don't want to collect emails but better-auth requires one
+          emailVerified: true,
+          image: guildMember.avatar
+            ? `https://cdn.discordapp.com/guilds/${Bun.env.DISCORD_GUILD_ID}/users/${guildMember.user.id}/avatars/${guildMember.avatar}.webp`
+            : guildMember.user.avatar
+            ? `https://cdn.discordapp.com/avatars/${guildMember.user.id}/${guildMember.user.avatar}.webp`
+            : undefined, // https://docs.discord.com/developers/reference#image-formatting
+          name:
+            guildMember.nick ||
+            guildMember.user.global_name ||
+            guildMember.user.username,
+          discordUserId: guildMember.user.id,
+        };
+        console.log("New user");
+        console.log(JSON.stringify(user, null, 2));
+
         return {
-          user: {
-            id: guildMember.user.id, // this gets overwritten for some reason, use discordUserId
-            email: "fake@example.com", // I don't want to collect emails but better-auth requires one
-            emailVerified: false,
-            image: guildMember.avatar
-              ? `https://cdn.discordapp.com/guilds/${Bun.env.DISCORD_GUILD_ID}/users/${guildMember.user.id}/avatars/${guildMember.avatar}.webp`
-              : guildMember.user.avatar
-                ? `https://cdn.discordapp.com/avatars/${guildMember.user.id}/${guildMember.user.avatar}.webp`
-                : undefined, // https://docs.discord.com/developers/reference#image-formatting
-            name:
-              guildMember.nick ||
-              guildMember.user.global_name ||
-              guildMember.user.username,
-            discordUserId: guildMember.user.id,
-          },
+          user,
           data: guildMember,
         };
       },
