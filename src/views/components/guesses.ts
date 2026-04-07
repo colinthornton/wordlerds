@@ -1,18 +1,18 @@
 import { html } from "hono/html";
-import { Feedback, type Attempt } from "../../lib/wordle";
+import { Feedback, type Guess } from "../../lib/wordle";
 
-export const attempts = (props: { attempts: Attempt[] }) => {
+export const guesses = (props: { guesses: Guess[] }) => {
   return html`<div
-    id="attempts"
+    id="guesses"
     class="grid grid-rows-6 gap-1.5 max-w-full w-87.5 h-105 my-8"
   >
-    ${props.attempts.map(row)}${props.attempts.length < 6 && input()}
-    ${props.attempts.length < 5 && placeholders(5 - props.attempts.length)}
+    ${props.guesses.map(row)}${props.guesses.length < 6 && input()}
+    ${props.guesses.length < 5 && placeholders(5 - props.guesses.length)}
   </div>`;
 };
 
 // displays rows of previous attempts
-const row = (attempt: Attempt) => {
+const row = (attempt: Guess) => {
   const letters = attempt.feedback.map((feedback, i) => ({
     letter: attempt.word[i] as string,
     feedback,

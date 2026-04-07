@@ -10,19 +10,19 @@ export const enum Feedback {
   Correct = 2,
 }
 
-export interface Attempt {
+export interface Guess {
   word: string;
   feedback: Feedback[];
 }
 
 export class Wordle {
-  readonly attempts: Attempt[] = [];
+  readonly guesses: Guess[] = [];
 
   get state() {
-    const lastAttempt = this.attempts.at(-1);
-    if (!lastAttempt) return "IN_PROGRESS";
-    if (lastAttempt.word === this.solution) return "WIN";
-    if (this.attempts.length === 6) return "LOSE";
+    const lastGuess = this.guesses.at(-1);
+    if (!lastGuess) return "IN_PROGRESS";
+    if (lastGuess.word === this.solution) return "WIN";
+    if (this.guesses.length === 6) return "LOSS";
     return "IN_PROGRESS";
   }
 
@@ -32,11 +32,11 @@ export class Wordle {
 
   get letters() {
     const letters: Record<string, Feedback> = {};
-    for (const attempt of this.attempts) {
-      for (let i = 0; i < attempt.word.length; i++) {
-        const letter = attempt.word[i] as string;
+    for (const guess of this.guesses) {
+      for (let i = 0; i < guess.word.length; i++) {
+        const letter = guess.word[i] as string;
         letters[letter] ??= Feedback.NotPresent;
-        letters[letter] = Math.max(letters[letter], attempt.feedback[i]!);
+        letters[letter] = Math.max(letters[letter], guess.feedback[i]!);
       }
     }
     return letters;
@@ -44,16 +44,16 @@ export class Wordle {
 
   constructor(
     readonly solution: string,
-    attempts: string[] = [],
+    guesses: string[] = [],
   ) {
     if (!solutions.has(solution)) {
       throw new WordNotInSolutionsError();
     }
 
-    attempts.forEach((a) => this.makeAttempt(a));
+    guesses.forEach((a) => this.makeGuess(a));
   }
 
-  makeAttempt(word: string) {
+  makeGuess(word: string) {
     if (this.gameOver) {
       throw new GameOverError();
     }
@@ -62,26 +62,26 @@ export class Wordle {
       throw new WordNotInDictionaryError();
     }
 
-    const prevAttempt = this.attempts.at(-1);
-    if (prevAttempt) {
-      this.validateHardMode(word, prevAttempt);
+    const prevGuess = this.guesses.at(-1);
+    if (prevGuess) {
+      this.validateHardMode(word, prevGuess);
     }
 
-    this.attempts.push({ word, feedback: this.getFeedback(word) });
+    this.guesses.push({ word, feedback: this.getFeedback(word) });
   }
 
-  private validateHardMode(word: string, prevAttempt: Attempt) {
+  private validateHardMode(word: string, prevGuess: Guess) {
     const presentCounts: Record<string, number> = {};
 
-    for (let i = 0; i < prevAttempt.word.length; i++) {
-      const letter = prevAttempt.word[i] as string;
+    for (let i = 0; i < prevGuess.word.length; i++) {
+      const letter = prevGuess.word[i] as string;
 
       // must play correct letters in same spot
-      if (prevAttempt.feedback[i] === Feedback.Correct && word[i] !== letter) {
+      if (prevGuess.feedback[i] === Feedback.Correct && word[i] !== letter) {
         throw new HardModeError();
       }
 
-      if (prevAttempt.feedback[i] === Feedback.NotPresent) continue;
+      if (prevGuess.feedback[i] === Feedback.NotPresent) continue;
 
       presentCounts[letter] ??= 0;
       presentCounts[letter]++;
@@ -127,7 +127,7 @@ export class Wordle {
   }
 }
 
-/** Words allowed to be used for attempts */
+/** Words allowed to be used for guesses */
 export const dictionary = new Set([
   "aahed",
   "aalii",

@@ -14,7 +14,7 @@ import {
 import { authMiddleware } from "./middleware/auth";
 import { signInGuard } from "./middleware/sign_in_guard";
 import { authRoutes } from "./routes/auth";
-import { attempts } from "./views/components/attempts";
+import { guesses } from "./views/components/guesses";
 import { keyboard } from "./views/components/keyboard";
 import {
   hardModeToast,
@@ -41,12 +41,12 @@ const app = new Hono()
     return c.html(
       rootView({
         user: c.var.user,
-        attempts: game.attempts,
+        guesses: game.guesses,
         letters: game.letters,
       }),
     );
   })
-  .post("/attempts", async (c) => {
+  .post("/guesses", async (c) => {
     const reader = await ServerSentEventGenerator.readSignals(c.req.raw);
     if (!reader.success) {
       throw new HTTPException(500);
@@ -60,7 +60,7 @@ const app = new Hono()
     }
 
     try {
-      game.makeAttempt(signals.word);
+      game.makeGuess(signals.word);
     } catch (error) {
       if (error instanceof WordNotInDictionaryError) {
         return ServerSentEventGenerator.stream((s) => {
@@ -100,7 +100,7 @@ const app = new Hono()
         newWordle();
       }
       s.patchSignals(JSON.stringify({ word: "" }));
-      s.patchElements(attempts({ attempts: game.attempts }).toString());
+      s.patchElements(guesses({ guesses: game.guesses }).toString());
       s.patchElements(keyboard({ letters: game.letters }).toString());
     });
   });

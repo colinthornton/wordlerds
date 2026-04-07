@@ -7,6 +7,58 @@ import {
   WordNotInSolutionsError,
 } from "./wordle";
 
+describe("#state", () => {
+  test("IN_PROGRESS for new game", () => {
+    const game = new Wordle("hello");
+
+    expect(game.state).toEqual("IN_PROGRESS");
+  });
+
+  test("IN_PROGRESS for unsolved game at 5 attempts", () => {
+    const game = new Wordle("hello", [
+      "guess",
+      "guess",
+      "guess",
+      "guess",
+      "guess",
+    ]);
+
+    expect(game.state).toEqual("IN_PROGRESS");
+  });
+
+  test("LOSS for unsolved game at 6 attempts", () => {
+    const game = new Wordle("hello", [
+      "guess",
+      "guess",
+      "guess",
+      "guess",
+      "guess",
+      "guess",
+    ]);
+
+    expect(game.state).toEqual("LOSS");
+  });
+
+  test("WIN for solved game", () => {
+    const game = new Wordle("hello", ["hello"]);
+
+    expect(game.state).toEqual("WIN");
+  });
+
+  test("LOSS for unsolved game at 6 attempts", () => {
+    const game = new Wordle("hello", [
+      "guess",
+      "guess",
+      "guess",
+      "guess",
+      "guess",
+      "hello",
+    ]);
+
+    expect(game.state).toEqual("WIN");
+  });
+});
+
 describe("#gameOver", () => {
   test("false for new game", () => {
     const game = new Wordle("guess");
@@ -33,7 +85,7 @@ describe("#gameOver", () => {
     expect(game.gameOver).toBeTrue();
   });
 
-  test("true for max attempts", () => {
+  test("true for max guesses", () => {
     const game = new Wordle("guess", [
       "games",
       "games",
@@ -50,9 +102,9 @@ describe("#gameOver", () => {
 describe("feedback", () => {
   test("finds solution", () => {
     const game = new Wordle("guess");
-    game.makeAttempt("guess");
+    game.makeGuess("guess");
 
-    expect(game.attempts).toEqual([
+    expect(game.guesses).toEqual([
       {
         word: "guess",
         feedback: [
@@ -68,9 +120,9 @@ describe("feedback", () => {
 
   test("multiple present letters", () => {
     const game = new Wordle("droll");
-    game.makeAttempt("llama");
+    game.makeGuess("llama");
 
-    expect(game.attempts).toEqual([
+    expect(game.guesses).toEqual([
       {
         word: "llama",
         feedback: [
@@ -88,7 +140,7 @@ describe("feedback", () => {
     // edge case: in testing I had "toast" show up with the first "T" marked present and the final "T" marked not present
     const game = new Wordle("coast", ["prime", "lousy", "toast"]);
 
-    expect(game.attempts.at(-1)!.feedback).toEqual([
+    expect(game.guesses.at(-1)!.feedback).toEqual([
       Feedback.NotPresent,
       Feedback.Correct,
       Feedback.Correct,
@@ -106,7 +158,7 @@ describe("errors", () => {
   test("not in dictionary", () => {
     const game = new Wordle("guess");
 
-    expect(() => game.makeAttempt("lorem")).toThrow(WordNotInDictionaryError);
+    expect(() => game.makeGuess("lorem")).toThrow(WordNotInDictionaryError);
   });
 
   describe("hard mode", () => {
@@ -114,28 +166,28 @@ describe("errors", () => {
       const game = new Wordle("hardy", ["hovel"]);
 
       // missing initial "h"
-      expect(() => game.makeAttempt("there")).toThrow(HardModeError);
+      expect(() => game.makeGuess("there")).toThrow(HardModeError);
     });
 
     test("must play present letter", () => {
       const game = new Wordle("gourd", ["death"]);
 
       // missing present "d"
-      expect(() => game.makeAttempt("price")).toThrow(HardModeError);
+      expect(() => game.makeGuess("price")).toThrow(HardModeError);
     });
 
     test("must play all present letters", () => {
       const game = new Wordle("llama", ["droll"]);
 
       // missing second "l"
-      expect(() => game.makeAttempt("lever")).toThrow(HardModeError);
-      expect(() => game.makeAttempt("level")).not.toThrow();
+      expect(() => game.makeGuess("lever")).toThrow(HardModeError);
+      expect(() => game.makeGuess("level")).not.toThrow();
     });
 
     test("must play all present letters when one is correct", () => {
       const game = new Wordle("droll", ["level"]);
 
-      expect(() => game.makeAttempt("panel")).toThrow(HardModeError);
+      expect(() => game.makeGuess("panel")).toThrow(HardModeError);
     });
   });
 });
