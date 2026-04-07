@@ -3,6 +3,7 @@ import { BunSqliteDialect } from "kysely-bun-sqlite";
 
 const database = new Database("sqlite/wordlerds.sqlite");
 database.run("PRAGMA journal_mode = WAL;");
+database.run("PRAGMA foreign_keys = TRUE;");
 
 export const dialect = new BunSqliteDialect({
   database,
