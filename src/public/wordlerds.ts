@@ -1,10 +1,13 @@
 import "basecoat-css/basecoat";
 import "basecoat-css/toast";
 
-document.querySelector("#sign-in")?.addEventListener("click", async (e) => {
-  const button = e.target as HTMLButtonElement;
-  button.disabled = true;
+declare global {
+  interface Window {
+    signIn: () => Promise<void>;
+  }
+}
 
+window.signIn = async () => {
   const res = await fetch("/api/auth/sign-in/social", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -16,5 +19,4 @@ document.querySelector("#sign-in")?.addEventListener("click", async (e) => {
   }
 
   console.error(message);
-  button.disabled = false;
-});
+};
