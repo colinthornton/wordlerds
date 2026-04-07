@@ -1,7 +1,11 @@
 import { Database } from "bun:sqlite";
 import { BunSqliteDialect } from "kysely-bun-sqlite";
 
-const database = new Database("sqlite/wordlerds.sqlite");
+const filename =
+  Bun.env.NODE_ENV === "production"
+    ? "wordlerds"
+    : `wordlerds-${Bun.env.NODE_ENV}`;
+const database = new Database(`sqlite/${filename}.sqlite`);
 database.run("PRAGMA journal_mode = WAL;");
 database.run("PRAGMA foreign_keys = TRUE;");
 

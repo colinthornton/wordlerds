@@ -1,21 +1,18 @@
 import { type MiddlewareHandler } from "hono";
-import { db } from "../db";
 import { auth } from "../lib/auth";
-import * as User from "../models/user";
+import { User } from "../models/user";
 
 /**
  * Set login user data on the context
  */
 export const authMiddleware: MiddlewareHandler = async (c, next) => {
   if (Bun.env.NODE_ENV === "development") {
-    const user = await db
-      .selectFrom("users")
-      .selectAll()
-      .where("id", "=", 1)
-      .executeTakeFirstOrThrow();
-    c.set("user", user);
-    await next();
-    return;
+    const user = await User.findById(1);
+    if (user) {
+      c.set("user", user);
+      await next();
+      return;
+    }
   }
 
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
@@ -26,7 +23,7 @@ export const authMiddleware: MiddlewareHandler = async (c, next) => {
     return;
   }
 
-  const user = await User.createOrUpdate(db, {
+  const user = await User.createOrUpdate({
     discord_user_id: session.user.discordUserId,
     name: session.user.name,
     avatar: session.user.image,

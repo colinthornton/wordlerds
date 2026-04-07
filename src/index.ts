@@ -4,7 +4,6 @@ import { serveStatic } from "hono/bun";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { z } from "zod";
-import type { User } from "./db/schema";
 import {
   HardModeError,
   solutions,
@@ -13,6 +12,7 @@ import {
 } from "./lib/wordle";
 import { authMiddleware } from "./middleware/auth";
 import { signInGuard } from "./middleware/sign_in_guard";
+import type { User } from "./models/user";
 import { authRoutes } from "./routes/auth";
 import { guesses } from "./views/components/guesses";
 import { keyboard } from "./views/components/keyboard";
