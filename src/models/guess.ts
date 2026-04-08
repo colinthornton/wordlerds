@@ -1,7 +1,10 @@
 import { db } from "../db";
 import type * as Schema from "../db/schema";
+import type * as Wordle from "../lib/wordle";
 import type { Feedback } from "../lib/wordle";
 import { mapBy } from "../utils/map_by";
+import type { Game } from "./game";
+import { User } from "./user";
 
 export class Guess {
   readonly id: Schema.Guess["id"];
@@ -11,21 +14,27 @@ export class Guess {
   readonly feedback: Feedback[];
   readonly user: Schema.User;
 
+  static async create(newGuess: Wordle.Guess, game: Game, user: User) {
+    const guess = await db
+      .insertInto("guesses")
+      .values({
+        word: newGuess.word,
+        feedback: newGuess.feedback.join(""),
+        game_id: game.id,
+        user_id: user.id,
+      })
+      .returningAll()
+      .executeTakeFirstOrThrow();
+    return new Guess(guess, user);
+  }
+
   static async findAllByGame(game: Schema.Game) {
     const guesses = await db
       .selectFrom("guesses")
       .selectAll()
       .where("game_id", "=", game.id)
       .execute();
-    const users = await db
-      .selectFrom("users")
-      .selectAll()
-      .where(
-        "id",
-        "in",
-        guesses.map((g) => g.user_id),
-      )
-      .execute();
+    const users = await User.findAllByGuesses(guesses);
     const userMap = mapBy(users, "id");
     return guesses.map((g) => new Guess(g, userMap.get(g.user_id)!));
   }
@@ -37,5 +46,12 @@ export class Guess {
     this.word = guess.word;
     this.feedback = guess.feedback.split("").map(Number);
     this.user = user;
+  }
+
+  get letters() {
+    return this.feedback.map((feedback, i) => ({
+      letter: this.word[i] as string,
+      feedback,
+    }));
   }
 }

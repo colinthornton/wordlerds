@@ -31,9 +31,25 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.notNull().references("users.id"),
     )
     .execute();
+
+  await db.schema
+    .createIndex("guesses_game_id_index")
+    .on("guesses")
+    .column("game_id")
+    .execute();
+
+  await db.schema
+    .createIndex("guesses_user_id_index")
+    .on("guesses")
+    .column("user_id")
+    .execute();
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
+  await db.schema.dropIndex("guesses_user_id_index").execute();
+
+  await db.schema.dropIndex("guesses_game_id_index").execute();
+
   await db.schema.dropTable("guesses").ifExists().execute();
 
   await db.schema.dropTable("games").ifExists().execute();

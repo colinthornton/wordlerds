@@ -16,8 +16,6 @@ export interface Guess {
 }
 
 export class Wordle {
-  readonly guesses: Guess[] = [];
-
   get state() {
     const lastGuess = this.guesses.at(-1);
     if (!lastGuess) return "IN_PROGRESS";
@@ -44,13 +42,11 @@ export class Wordle {
 
   constructor(
     readonly solution: string,
-    guesses: string[] = [],
+    readonly guesses: Guess[] = [],
   ) {
     if (!solutions.has(solution)) {
       throw new WordNotInSolutionsError();
     }
-
-    guesses.forEach((a) => this.makeGuess(a));
   }
 
   makeGuess(word: string) {
@@ -67,7 +63,9 @@ export class Wordle {
       this.validateHardMode(word, prevGuess);
     }
 
-    this.guesses.push({ word, feedback: this.getFeedback(word) });
+    const guess = { word, feedback: this.getFeedback(word) };
+    this.guesses.push(guess);
+    return guess;
   }
 
   private validateHardMode(word: string, prevGuess: Guess) {
@@ -106,22 +104,22 @@ export class Wordle {
       counts[letter]++;
     }
 
-    const feedback: Feedback[] = new Array(word.length).fill(
-      Feedback.NotPresent,
-    );
+    const feedback: Feedback[] = new Array(word.length);
     for (let i = 0; i < word.length; i++) {
       const letter = word[i] as string;
-      if (!counts[letter]) continue;
       if (letter !== this.solution[i]) continue;
       feedback[i] = Feedback.Correct;
-      counts[letter]--;
+      counts[letter]!--;
     }
     for (let i = 0; i < word.length; i++) {
-      const letter = word[i] as string;
-      if (!counts[letter]) continue;
       if (feedback[i] === Feedback.Correct) continue;
-      feedback[i] = Feedback.Present;
-      counts[letter]--;
+      const letter = word[i] as string;
+      if (counts[letter]) {
+        feedback[i] = Feedback.Present;
+        counts[letter]--;
+      } else {
+        feedback[i] = Feedback.NotPresent;
+      }
     }
     return feedback;
   }

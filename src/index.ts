@@ -12,6 +12,7 @@ import {
 } from "./lib/wordle";
 import { authMiddleware } from "./middleware/auth";
 import { signInGuard } from "./middleware/sign_in_guard";
+import { Game } from "./models/game";
 import type { User } from "./models/user";
 import { authRoutes } from "./routes/auth";
 import { guesses } from "./views/components/guesses";
@@ -37,7 +38,12 @@ const app = new Hono()
     return c.html(signInView());
   })
   .use<{ Variables: { user: User } }>(signInGuard)
-  .get("/", (c) => {
+  .get("/", async (c) => {
+    let game = await Game.findLatest();
+    if (!game || game.state !== "IN_PROGRESS") {
+      game = await Game.createWithRandomSolution();
+    }
+
     return c.html(
       rootView({
         user: c.var.user,
@@ -47,8 +53,11 @@ const app = new Hono()
     );
   })
   .post("/guesses", async (c) => {
-    const reader = await ServerSentEventGenerator.readSignals(c.req.raw);
-    if (!reader.success) {
+    const [reader, game] = await Promise.all([
+      ServerSentEventGenerator.readSignals(c.req.raw),
+      Game.findLatest(),
+    ]);
+    if (!(reader.success && game)) {
       throw new HTTPException(500);
     }
 
@@ -60,7 +69,7 @@ const app = new Hono()
     }
 
     try {
-      game.makeGuess(signals.word);
+      await game.makeGuess(signals.word, c.var.user);
     } catch (error) {
       if (error instanceof WordNotInDictionaryError) {
         return ServerSentEventGenerator.stream((s) => {

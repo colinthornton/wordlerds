@@ -53,6 +53,19 @@ export class User {
     return new User(user);
   }
 
+  static async findAllByGuesses(guesses: Schema.Guess[]) {
+    const users = await db
+      .selectFrom("users")
+      .selectAll()
+      .where(
+        "id",
+        "in",
+        guesses.map((g) => g.user_id),
+      )
+      .execute();
+    return users.map((user) => new User(user));
+  }
+
   private constructor(user: Schema.User) {
     this.id = user.id;
     this.created_at = user.created_at;

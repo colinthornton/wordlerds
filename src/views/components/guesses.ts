@@ -1,5 +1,6 @@
 import { html } from "hono/html";
-import { Feedback, type Guess } from "../../lib/wordle";
+import { Feedback } from "../../lib/wordle";
+import { Guess } from "../../models/guess";
 
 export const guesses = (props: { guesses: Guess[] }) => {
   return html`<div
@@ -12,13 +13,10 @@ export const guesses = (props: { guesses: Guess[] }) => {
 };
 
 // displays rows of previous attempts
-const row = (attempt: Guess) => {
-  const letters = attempt.feedback.map((feedback, i) => ({
-    letter: attempt.word[i] as string,
-    feedback,
-  }));
-
-  return html`<div class="grid grid-cols-5 gap-1.5">${letters.map(box)}</div>`;
+const row = (guess: Guess) => {
+  return html`<div class="grid grid-cols-5 gap-1.5">
+    ${guess.letters.map(box)}
+  </div>`;
 };
 
 const box = (props: { letter: string; feedback: Feedback }) =>
