@@ -1,4 +1,5 @@
 import { beforeAll } from "bun:test";
+import { CompiledQuery } from "kysely";
 import * as path from "node:path";
 import { beforeEach } from "node:test";
 import { db } from "../src/db";
@@ -20,9 +21,11 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await db.deleteFrom("guesses").execute();
+  await db.executeQuery(CompiledQuery.raw("PRAGMA foreign_keys = FALSE;"));
   await Promise.all([
     db.deleteFrom("games").execute(),
+    db.deleteFrom("guesses").execute(),
     db.deleteFrom("users").execute(),
   ]);
+  await db.executeQuery(CompiledQuery.raw("PRAGMA foreign_keys = TRUE;"));
 });

@@ -51,6 +51,7 @@ export class Game {
       .selectFrom("games")
       .selectAll()
       .orderBy("id", "desc")
+      .limit(1)
       .executeTakeFirst();
     if (!game) return null;
 
