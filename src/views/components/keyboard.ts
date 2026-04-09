@@ -27,7 +27,7 @@ const button = (key: string, letters: Record<string, Feedback>) => {
     case "Enter":
       return html`<button
         class="btn-icon flex-[1.5] uppercase font-bold h-14 p-0 text-[20px]"
-        data-on:pointerdown="@post('/guesses')"
+        data-on:pointerdown="$word.length === 5 && @post('/guesses')"
       >
         <svg
           class="size-5"
