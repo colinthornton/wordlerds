@@ -1,11 +1,6 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
 import { db } from "../db";
 import { User } from "./user";
-
-beforeEach(async () => {
-  await db.deleteFrom("guesses").execute();
-  await db.deleteFrom("users").execute();
-});
 
 describe(".createOrUpdate", () => {
   test("creates a new user", async () => {

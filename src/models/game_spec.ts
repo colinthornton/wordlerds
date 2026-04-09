@@ -1,11 +1,7 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
 import { db } from "../db";
 import { solutions } from "../lib/wordle";
 import { Game } from "./game";
-
-beforeEach(async () => {
-  await db.deleteFrom("games").execute();
-});
 
 describe(".create", () => {
   test("creates a new game", async () => {

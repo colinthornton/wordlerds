@@ -1,15 +1,7 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
 import { db } from "../db";
 import { Feedback } from "../lib/wordle";
 import { Guess } from "./guess";
-
-beforeEach(async () => {
-  await Promise.all([
-    db.deleteFrom("games").execute(),
-    db.deleteFrom("guesses").execute(),
-    db.deleteFrom("users").execute(),
-  ]);
-});
 
 describe(".findAllByGame", () => {
   test("returns guesses associated with the game", async () => {
