@@ -16,7 +16,7 @@ export const guesses = (props: { guesses: Guess[] }) => {
 // displays rows of previous attempts
 const row = (guess: Guess) => {
   return html`<div class="grid grid-cols-6 gap-1.5">
-    <div class="place-self-center">${avatar({ user: guess.user })}</div>
+    <div class="place-self-center -mr-1.5">${avatar({ user: guess.user })}</div>
     ${guess.letters.map(box)}
   </div>`;
 };
