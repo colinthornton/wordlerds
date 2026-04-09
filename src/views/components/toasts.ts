@@ -1,6 +1,13 @@
 import { html } from "hono/html";
 import { dictionary } from "../../lib/wordle";
 
+export const alreadyGuessedToast = () => {
+  return toast({
+    emoji: "1253891674329841677",
+    title: "You can't guess twice",
+  });
+};
+
 const hardModeEmojis = [
   "1265484171598364733",
   "1312821859250737275",

@@ -18,6 +18,7 @@ import { authRoutes } from "./routes/auth";
 import { guesses } from "./views/components/guesses";
 import { keyboard } from "./views/components/keyboard";
 import {
+  alreadyGuessedToast,
   hardModeToast,
   notInDictionaryToast,
   toast,
@@ -59,6 +60,16 @@ const app = new Hono()
     ]);
     if (!(reader.success && game)) {
       throw new HTTPException(500);
+    }
+
+    const guessedUserIds = new Set(game.guesses.map((guess) => guess.user.id));
+    if (guessedUserIds.has(c.var.user.id)) {
+      return ServerSentEventGenerator.stream((s) => {
+        s.patchElements(alreadyGuessedToast().toString(), {
+          selector: "#toaster",
+          mode: "append",
+        });
+      });
     }
 
     const { success: signalsValid, data: signals } = z
