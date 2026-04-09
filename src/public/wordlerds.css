@@ -1,13 +1,20 @@
 @import "tailwindcss";
 @import "basecoat-css";
 
-@theme {
+@theme inline {
   --color-not-present: #262626;
   --color-present: #facc15;
   --color-correct: #84cc16;
+  --color-border: var(--color-neutral-700);
 }
 
 :root.dark {
   --background: #1c1b22;
   --foreground: #fbfbfe;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
 }

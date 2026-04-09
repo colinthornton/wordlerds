@@ -1,5 +1,6 @@
 import { html } from "hono/html";
 import type { User } from "../db/schema";
+import { avatar } from "./components/avatar";
 
 export const layout = (props: {
   user: User | null;
@@ -22,11 +23,7 @@ export const layout = (props: {
             class="mx-auto max-w-xl h-full px-4 flex justify-between items-center"
           >
             ${props.user
-              ? html`<img
-                  class="size-8 shrink-0 object-cover rounded-full"
-                  alt="${props.user.name}"
-                  src="${props.user.avatar}"
-                />`
+              ? avatar({ user: props.user })
               : html`<div class="size-8 shrink-0"></div>`}
             <h1 class="font-bold uppercase">Wordlerds</h1>
             <div class="size-8 shrink-0"></div>
