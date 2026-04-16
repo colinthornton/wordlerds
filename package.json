@@ -13,6 +13,7 @@
   "dependencies": {
     "@starfederation/datastar-sdk": "^1.0.0-RC.3",
     "better-auth": "^1.5.6",
+    "bunqueue": "^2.6.115",
     "hono": "^4.12.10",
     "kysely": "^0.28.15",
     "kysely-bun-sqlite": "^0.4.0",
@@ -27,6 +28,8 @@
     "tailwindcss": "^4.2.2"
   },
   "trustedDependencies": [
-    "@parcel/watcher"
+    "@parcel/watcher",
+    "bun",
+    "msgpackr-extract"
   ]
 }

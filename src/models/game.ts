@@ -84,5 +84,6 @@ export class Game {
     const wordleGuess = this.wordle.makeGuess(word);
     const guess = await Guess.create(wordleGuess, this, user);
     this.guesses.push(guess);
+    return guess;
   }
 }

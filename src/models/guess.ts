@@ -28,6 +28,21 @@ export class Guess {
     return new Guess(guess, user);
   }
 
+  static async findById(id: number) {
+    const guess = await db
+      .selectFrom("guesses")
+      .selectAll()
+      .where("guesses.id", "=", id)
+      .limit(1)
+      .executeTakeFirst();
+    if (!guess) return null;
+
+    const user = await User.findById(guess.user_id);
+    if (!user) return null;
+
+    return new Guess(guess, user);
+  }
+
   static async findAllByGame(game: Schema.Game) {
     const guesses = await db
       .selectFrom("guesses")
@@ -39,7 +54,7 @@ export class Guess {
     return guesses.map((g) => new Guess(g, userMap.get(g.user_id)!));
   }
 
-  private constructor(guess: Schema.Guess, user: Schema.User) {
+  private constructor(guess: Schema.Guess, user: User) {
     this.id = guess.id;
     this.created_at = guess.created_at;
     this.updated_at = guess.updated_at;

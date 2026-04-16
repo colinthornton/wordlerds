@@ -4,6 +4,7 @@ import { serveStatic } from "hono/bun";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { z } from "zod";
+import { sendGuessWebhook } from "./jobs/guess_notify_job";
 import {
   HardModeError,
   solutions,
@@ -80,7 +81,32 @@ const app = new Hono()
     }
 
     try {
-      await game.makeGuess(signals.word, c.var.user);
+      const guess = await game.makeGuess(signals.word, c.var.user);
+
+      sendGuessWebhook(guess.id);
+
+      return ServerSentEventGenerator.stream((s) => {
+        if (game.state !== "IN_PROGRESS") {
+          const toastOptions =
+            game.state === "WIN"
+              ? {
+                  title: `"${signals.word}" was correct!`,
+                  emoji: "966369258735038524",
+                }
+              : {
+                  title: `The word was "${game.solution}"`,
+                  emoji: "1139222642226900992",
+                };
+          s.patchElements(toast(toastOptions).toString(), {
+            selector: "#toaster",
+            mode: "append",
+          });
+          newWordle();
+        }
+        s.patchSignals(JSON.stringify({ word: "" }));
+        s.patchElements(guesses({ guesses: game.guesses }).toString());
+        s.patchElements(keyboard({ letters: game.letters }).toString());
+      });
     } catch (error) {
       if (error instanceof WordNotInDictionaryError) {
         return ServerSentEventGenerator.stream((s) => {
@@ -100,29 +126,6 @@ const app = new Hono()
         });
       }
     }
-
-    return ServerSentEventGenerator.stream((s) => {
-      if (game.state !== "IN_PROGRESS") {
-        const toastOptions =
-          game.state === "WIN"
-            ? {
-                title: `"${signals.word}" was correct!`,
-                emoji: "966369258735038524",
-              }
-            : {
-                title: `The word was "${game.solution}"`,
-                emoji: "1139222642226900992",
-              };
-        s.patchElements(toast(toastOptions).toString(), {
-          selector: "#toaster",
-          mode: "append",
-        });
-        newWordle();
-      }
-      s.patchSignals(JSON.stringify({ word: "" }));
-      s.patchElements(guesses({ guesses: game.guesses }).toString());
-      s.patchElements(keyboard({ letters: game.letters }).toString());
-    });
   });
 
 const server = Bun.serve({
