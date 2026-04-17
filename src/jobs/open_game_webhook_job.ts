@@ -22,8 +22,9 @@ const openGameQueue = new Bunqueue<{ gameId: number }>("game_open_webhooks", {
 });
 
 const sendGameOpenWebhookToDiscord = async (gameId: number) => {
-  const game = Game.findById(gameId);
+  const game = await Game.findById(gameId);
   if (!game) return false;
+  if (game.state !== "IN_PROGRESS") return true; // do nothing if the game's already over
 
   const webhookUrl = Bun.env.DISCORD_WEBHOOK_URL;
   if (!webhookUrl) return false;
