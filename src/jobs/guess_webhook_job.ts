@@ -20,10 +20,10 @@ const guessWebhookQueue = new Bunqueue<{ guessId: number }>("guess_webhooks", {
 
 const sendGuessWebhookToDiscord = async (guessId: number) => {
   const guess = await Guess.findById(guessId);
-  if (!guess) return;
+  if (!guess) return false;
 
   const webhookUrl = Bun.env.DISCORD_WEBHOOK_URL;
-  if (!webhookUrl) return;
+  if (!webhookUrl) return false;
 
   const squares = guess.feedback.map((f) => feedbackEmoji[f]).join("");
   const word = guess.word.toUpperCase();

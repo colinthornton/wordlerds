@@ -4,8 +4,8 @@ import type * as Schema from "../db/schema";
 
 export class User {
   readonly id: Schema.User["id"];
-  readonly created_at: Schema.User["created_at"];
-  readonly updated_at: Schema.User["updated_at"];
+  readonly created_at: Date;
+  readonly updated_at: Date;
   readonly discord_user_id: Schema.User["discord_user_id"];
   readonly name: Schema.User["name"];
   readonly avatar: Schema.User["avatar"];
@@ -68,8 +68,8 @@ export class User {
 
   private constructor(user: Schema.User) {
     this.id = user.id;
-    this.created_at = user.created_at;
-    this.updated_at = user.updated_at;
+    this.created_at = new Date(user.created_at);
+    this.updated_at = new Date(user.updated_at);
     this.discord_user_id = user.discord_user_id;
     this.name = user.name;
     this.avatar = user.avatar;

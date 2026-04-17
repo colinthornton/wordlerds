@@ -1,5 +1,5 @@
 import { html } from "hono/html";
-import type { User } from "../db/schema";
+import type { User } from "../models/user";
 import { avatar } from "./components/avatar";
 
 export const layout = (props: {

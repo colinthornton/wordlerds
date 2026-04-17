@@ -8,9 +8,10 @@ export interface DB {
 
 export interface GameTable {
   id: Generated<number>;
-  created_at: Generated<Date>;
-  updated_at: Generated<Date>;
+  created_at: Generated<string>;
+  updated_at: Generated<string>;
   solution: string;
+  opens_at: string | null;
 }
 export type Game = Selectable<GameTable>;
 export type NewGame = Insertable<GameTable>;
@@ -18,8 +19,8 @@ export type GameUpdate = Updateable<GameTable>;
 
 export interface GuessTable {
   id: Generated<number>;
-  created_at: Generated<Date>;
-  updated_at: Generated<Date>;
+  created_at: Generated<string>;
+  updated_at: Generated<string>;
   word: string;
   feedback: string;
   game_id: number;
@@ -31,8 +32,8 @@ export type GuessUpdate = Updateable<GuessTable>;
 
 export interface UserTable {
   id: Generated<number>;
-  created_at: Generated<Date>;
-  updated_at: Generated<Date>;
+  created_at: Generated<string>;
+  updated_at: Generated<string>;
   discord_user_id: string;
   name: string;
   avatar: string | null;

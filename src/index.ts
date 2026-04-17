@@ -4,7 +4,8 @@ import { serveStatic } from "hono/bun";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { z } from "zod";
-import { sendGuessWebhook } from "./jobs/guess_notify_job";
+import { sendGuessWebhook } from "./jobs/guess_webhook_job";
+import { scheduleGameOpenWebhook } from "./jobs/open_game_webhook_job";
 import {
   HardModeError,
   solutions,
@@ -44,6 +45,7 @@ const app = new Hono()
     let game = await Game.findLatest();
     if (!game || game.state !== "IN_PROGRESS") {
       game = await Game.createWithRandomSolution();
+      scheduleGameOpenWebhook(game);
     }
 
     return c.html(
@@ -63,14 +65,18 @@ const app = new Hono()
       throw new HTTPException(500);
     }
 
-    const guessedUserIds = new Set(game.guesses.map((guess) => guess.user.id));
-    if (guessedUserIds.has(c.var.user.id)) {
-      return ServerSentEventGenerator.stream((s) => {
-        s.patchElements(alreadyGuessedToast().toString(), {
-          selector: "#toaster",
-          mode: "append",
+    if (!game.open) {
+      const guessedUserIds = new Set(
+        game.guesses.map((guess) => guess.user.id),
+      );
+      if (guessedUserIds.has(c.var.user.id)) {
+        return ServerSentEventGenerator.stream((s) => {
+          s.patchElements(alreadyGuessedToast().toString(), {
+            selector: "#toaster",
+            mode: "append",
+          });
         });
-      });
+      }
     }
 
     const { success: signalsValid, data: signals } = z

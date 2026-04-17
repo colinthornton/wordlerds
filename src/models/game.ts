@@ -6,13 +6,23 @@ import type { User } from "./user";
 
 export class Game {
   readonly id: Schema.Game["id"];
-  readonly created_at: Schema.Game["created_at"];
-  readonly updated_at: Schema.Game["updated_at"];
+  readonly created_at: Date;
+  readonly updated_at: Date;
   readonly solution: Schema.Game["solution"];
+  readonly opens_at: Date | null;
   readonly guesses: Guess[];
   private wordle: Wordle;
 
   static async create(newGame: Schema.NewGame) {
+    if (!newGame.opens_at) {
+      const twentyFourHours = 24 * 60 * 60 * 1000;
+      const thirtySixHours = 36 * 60 * 60 * 1000;
+      const delay = Math.floor(
+        Math.random() * (thirtySixHours - twentyFourHours) + twentyFourHours,
+      );
+      newGame.opens_at = new Date(Date.now() + delay).toISOString();
+    }
+
     const game = await db
       .insertInto("games")
       .values(newGame)
@@ -46,6 +56,19 @@ export class Game {
     return this.create({ solution });
   }
 
+  static async findById(id: number) {
+    const game = await db
+      .selectFrom("games")
+      .selectAll()
+      .where("games.id", "=", id)
+      .limit(1)
+      .executeTakeFirst();
+    if (!game) return null;
+
+    const guesses = await Guess.findAllByGame(game);
+    return new Game(game, guesses);
+  }
+
   static async findLatest() {
     const game = await db
       .selectFrom("games")
@@ -61,9 +84,10 @@ export class Game {
 
   private constructor(game: Schema.Game, guesses: Guess[]) {
     this.id = game.id;
-    this.created_at = game.created_at;
-    this.updated_at = game.updated_at;
+    this.created_at = new Date(game.created_at);
+    this.updated_at = new Date(game.updated_at);
     this.solution = game.solution;
+    this.opens_at = game.opens_at ? new Date(game.opens_at) : null;
     this.guesses = guesses;
     this.wordle = new Wordle(
       game.solution,
@@ -77,6 +101,16 @@ export class Game {
 
   get letters() {
     return this.wordle.letters;
+  }
+
+  get open() {
+    if (!this.opens_at) return true;
+    return Date.now() >= this.opens_at.getTime();
+  }
+
+  get opens_in() {
+    if (!this.opens_at) return 0;
+    return this.opens_at.getTime() - Date.now();
   }
 
   async makeGuess(word: string, user: User) {

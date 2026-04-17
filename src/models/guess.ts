@@ -8,11 +8,11 @@ import { User } from "./user";
 
 export class Guess {
   readonly id: Schema.Guess["id"];
-  readonly created_at: Schema.Guess["created_at"];
-  readonly updated_at: Schema.Guess["updated_at"];
+  readonly created_at: Date;
+  readonly updated_at: Date;
   readonly word: Schema.Guess["word"];
   readonly feedback: Feedback[];
-  readonly user: Schema.User;
+  readonly user: User;
 
   static async create(newGuess: Wordle.Guess, game: Game, user: User) {
     const guess = await db
@@ -56,8 +56,8 @@ export class Guess {
 
   private constructor(guess: Schema.Guess, user: User) {
     this.id = guess.id;
-    this.created_at = guess.created_at;
-    this.updated_at = guess.updated_at;
+    this.created_at = new Date(guess.created_at);
+    this.updated_at = new Date(guess.updated_at);
     this.word = guess.word;
     this.feedback = guess.feedback.split("").map(Number);
     this.user = user;
