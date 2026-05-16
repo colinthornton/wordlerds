@@ -50,8 +50,11 @@ export async function backfillScores() {
           .where("id", "=", id)
           .where((eb) =>
             eb.or([
+              eb("scores", "is", null),
               eb("scores", "!=", scores),
+              eb("total_score", "is", null),
               eb("total_score", "!=", total_score),
+              eb("streak", "is", null),
               eb("streak", "!=", streak),
             ]),
           )
