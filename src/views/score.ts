@@ -35,7 +35,7 @@ export const scoreView = (props: {
         ${props.weekStats.map(
           (stats) =>
             html`<tr>
-              <td>${avatar({ user: props.user })}</td>
+              <td>${avatar({ user: stats.user })}</td>
               <td class="text-right">${stats.score}</td>
               <td class="text-right">${stats.maxStreak}</td>
               <td class="text-right">${stats.guesses}</td>

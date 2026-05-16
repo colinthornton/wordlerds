@@ -141,7 +141,7 @@ const app = new Hono()
 
     const weekGuesses = await Guess.findLast7Days();
     const weekStats = new Map<
-      User,
+      number, // user ID
       {
         user: User;
         score: number;
@@ -154,8 +154,8 @@ const app = new Hono()
       }
     >();
     for (const guess of weekGuesses) {
-      if (!weekStats.has(guess.user)) {
-        weekStats.set(guess.user, {
+      if (!weekStats.has(guess.user.id)) {
+        weekStats.set(guess.user.id, {
           user: guess.user,
           score: 0,
           maxStreak: 0,
@@ -166,7 +166,7 @@ const app = new Hono()
           accuracy: 0,
         });
       }
-      const acc = weekStats.get(guess.user)!;
+      const acc = weekStats.get(guess.user.id)!;
       const score = acc.score + guess.score;
       const maxStreak = Math.max(acc.maxStreak, guess.streak);
       const guesses = acc.guesses + 1;
@@ -181,7 +181,7 @@ const app = new Hono()
         guess.feedback.filter((f) => f === Feedback.NotPresent).length;
       const accuracy =
         (correct + present / 2) / (correct + present + notPresent);
-      weekStats.set(guess.user, {
+      weekStats.set(guess.user.id, {
         user: acc.user,
         score,
         maxStreak,
