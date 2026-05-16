@@ -1,3 +1,4 @@
+import { sql } from "kysely";
 import { db } from "../db";
 import type * as Schema from "../db/schema";
 import type { Feedback } from "../lib/wordle";
@@ -62,6 +63,22 @@ export class Guess {
       .selectFrom("guesses")
       .selectAll()
       .where("game_id", "=", game.id)
+      .execute();
+    const users = await User.findAllByGuesses(guesses);
+    const userMap = mapBy(users, "id");
+    return guesses.map((g) => new Guess(g, userMap.get(g.user_id)!));
+  }
+
+  static async findLast7Days() {
+    const guesses = await db
+      .selectFrom("guesses")
+      .selectAll()
+      .where(
+        "created_at",
+        ">=",
+        sql<string>`datetime('now', 'start of day', '-7 days')`,
+      )
+      .where("created_at", "<", sql<string>`datetime('now', 'start of day')`)
       .execute();
     const users = await User.findAllByGuesses(guesses);
     const userMap = mapBy(users, "id");

@@ -29,7 +29,9 @@ export const layout = (props: {
             <div class="size-8 shrink-0"></div>
           </div>
         </header>
-        <main class="flex flex-col items-center px-2">${props.body}</main>
+        <main class="max-w-xl mx-auto flex flex-col items-center px-2">
+          ${props.body}
+        </main>
         <div
           id="toaster"
           class="toaster bottom-[unset] top-0"
