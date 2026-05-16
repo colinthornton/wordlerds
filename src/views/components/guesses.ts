@@ -16,18 +16,37 @@ export const guesses = (props: { guesses: Guess[] }) => {
 // displays rows of previous attempts
 const row = (guess: Guess) => {
   return html`<div class="grid grid-cols-6 gap-1.5">
-    <div class="place-self-center -mr-1.5">${avatar({ user: guess.user })}</div>
+    <div class="w-full grid place-items-center">
+      <div class="-mr-1.5 relative">
+        ${avatar({ user: guess.user })}
+        <span class="absolute -top-3 left-1.5 -z-10"
+          >${guess.multiplier > 1 ? "🔥" : ""}</span
+        >
+        <span class="absolute -top-2 -left-0.5 -z-10"
+          >${guess.multiplier > 2 ? "🔥" : ""}</span
+        >
+        <span class="absolute -top-2 left-3.5 -z-10"
+          >${guess.multiplier > 2 ? "🔥" : ""}</span
+        >
+      </div>
+    </div>
     ${guess.letters.map(box)}
   </div>`;
 };
 
-const box = (props: { letter: string; feedback: Feedback }) =>
+const box = (props: { letter: string; feedback: Feedback; score: number }) =>
   html`<div
-    class="grid place-items-center border-2 text-3xl font-bold uppercase ${boxColor(
+    class="grid place-items-center border-2 relative text-3xl font-bold uppercase ${boxColor(
       props.feedback,
     )}"
   >
     ${props.letter}
+    ${props.score > 0
+      ? html`<span
+          class="badge-primary absolute -top-1 -right-1 text-[xx-small]"
+          >+${props.score}</span
+        >`
+      : ""}
   </div>`;
 
 const boxColor = (feedback: Feedback) => {

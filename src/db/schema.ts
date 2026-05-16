@@ -25,9 +25,9 @@ export interface GuessTable {
   feedback: string;
   game_id: number;
   user_id: number;
-  scores: string | null;
-  total_score: number | null;
-  streak: number | null;
+  scores: string; // nullable in DB but data backfilled
+  total_score: number; // nullable in DB but data backfilled
+  streak: number; // nullable in DB but data backfilled
 }
 export type Guess = Selectable<GuessTable>;
 export type NewGuess = Insertable<GuessTable>;

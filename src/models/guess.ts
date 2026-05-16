@@ -12,6 +12,9 @@ export class Guess {
   readonly updated_at: Date;
   readonly word: Schema.Guess["word"];
   readonly feedback: Feedback[];
+  readonly scores: number[];
+  readonly total_score: Schema.Guess["total_score"];
+  readonly streak: Schema.Guess["streak"];
   readonly user: User;
 
   static async create(newGuess: ScoredGuess, game: Game, user: User) {
@@ -71,13 +74,25 @@ export class Guess {
     this.updated_at = new Date(guess.updated_at);
     this.word = guess.word;
     this.feedback = guess.feedback.split("").map(Number);
+    this.scores = guess.scores.split("").map(Number);
+    this.total_score = guess.total_score;
+    this.streak = guess.streak;
     this.user = user;
   }
 
   get letters() {
     return this.feedback.map((feedback, i) => ({
-      letter: this.word[i] as string,
+      letter: this.word[i]!,
       feedback,
+      score: this.scores[i]! * this.multiplier,
     }));
+  }
+
+  get multiplier() {
+    return Math.min(this.streak, 3);
+  }
+
+  get score() {
+    return this.total_score * this.multiplier;
   }
 }

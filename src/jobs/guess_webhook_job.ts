@@ -30,7 +30,7 @@ const sendGuessWebhookToDiscord = async (guessId: number) => {
   const link = Bun.env.BETTER_AUTH_URL; // I should rename this but whatever
   const mention = `<@${guess.user.discord_user_id}>`;
 
-  const content = `[${squares} ${word}](${link}) by ${mention}`;
+  const content = `[${squares} ${word}](${link}) by ${mention} (+${guess.score})`;
 
   const res = await fetch(webhookUrl, {
     method: "POST",
