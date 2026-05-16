@@ -1,7 +1,7 @@
 import { db } from "../db";
 import type * as Schema from "../db/schema";
-import type * as Wordle from "../lib/wordle";
 import type { Feedback } from "../lib/wordle";
+import type { ScoredGuess } from "../lib/wordle_score";
 import { mapBy } from "../utils/map_by";
 import type { Game } from "./game";
 import { User } from "./user";
@@ -14,7 +14,15 @@ export class Guess {
   readonly feedback: Feedback[];
   readonly user: User;
 
-  static async create(newGuess: Wordle.Guess, game: Game, user: User) {
+  static async create(newGuess: ScoredGuess, game: Game, user: User) {
+    const prevGameGuess = await db
+      .selectFrom("guesses")
+      .select("streak")
+      .where("user_id", "=", user.id)
+      .where("game_id", "=", game.id - 1)
+      .limit(1)
+      .executeTakeFirst();
+    const streak = prevGameGuess?.streak ? prevGameGuess.streak + 1 : 1;
     const guess = await db
       .insertInto("guesses")
       .values({
@@ -22,6 +30,9 @@ export class Guess {
         feedback: newGuess.feedback.join(""),
         game_id: game.id,
         user_id: user.id,
+        scores: newGuess.scores.join(""),
+        total_score: newGuess.scores.reduce((a, b) => a + b),
+        streak,
       })
       .returningAll()
       .executeTakeFirstOrThrow();

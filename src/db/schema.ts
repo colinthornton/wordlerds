@@ -25,6 +25,9 @@ export interface GuessTable {
   feedback: string;
   game_id: number;
   user_id: number;
+  scores: string | null;
+  total_score: number | null;
+  streak: number | null;
 }
 export type Guess = Selectable<GuessTable>;
 export type NewGuess = Insertable<GuessTable>;

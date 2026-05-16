@@ -1,6 +1,7 @@
 import { db } from "../db";
 import type * as Schema from "../db/schema";
 import { solutions, Wordle } from "../lib/wordle";
+import { scoreGuesses } from "../lib/wordle_score";
 import { Guess } from "./guess";
 import type { User } from "./user";
 
@@ -115,8 +116,12 @@ export class Game {
 
   async makeGuess(word: string, user: User) {
     // Throws WordleError if invalid
-    const wordleGuess = this.wordle.makeGuess(word);
-    const guess = await Guess.create(wordleGuess, this, user);
+    this.wordle.makeGuess(word);
+    const scoredGuess = scoreGuesses(
+      this.wordle.solution,
+      this.wordle.guesses,
+    ).at(-1)!;
+    const guess = await Guess.create(scoredGuess, this, user);
     this.guesses.push(guess);
     return guess;
   }
