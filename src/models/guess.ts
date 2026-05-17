@@ -85,6 +85,17 @@ export class Guess {
     return guesses.map((g) => new Guess(g, userMap.get(g.user_id)!));
   }
 
+  static async findCurrentMonth() {
+    const guesses = await db
+      .selectFrom("guesses")
+      .selectAll()
+      .where("created_at", ">=", sql<string>`datetime('now', 'start of month')`)
+      .execute();
+    const users = await User.findAllByGuesses(guesses);
+    const userMap = mapBy(users, "id");
+    return guesses.map((g) => new Guess(g, userMap.get(g.user_id)!));
+  }
+
   private constructor(guess: Schema.Guess, user: User) {
     this.id = guess.id;
     this.created_at = new Date(guess.created_at);

@@ -3,7 +3,9 @@ import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
+import { CompiledQuery } from "kysely";
 import { z } from "zod";
+import { db } from "./db";
 import { sendGuessWebhook } from "./jobs/guess_webhook_job";
 import { scheduleGameOpenWebhook } from "./jobs/open_game_webhook_job";
 import {
@@ -139,8 +141,8 @@ const app = new Hono()
   .get("/score", async (c) => {
     const user = c.get("user");
 
-    const weekGuesses = await Guess.findLast7Days();
-    const weekStats = new Map<
+    const monthGuesses = await Guess.findCurrentMonth();
+    const monthStats = new Map<
       number, // user ID
       {
         user: User;
@@ -150,12 +152,13 @@ const app = new Hono()
         correct: number;
         present: number;
         notPresent: number;
+        scored: number;
         accuracy: number;
       }
     >();
-    for (const guess of weekGuesses) {
-      if (!weekStats.has(guess.user.id)) {
-        weekStats.set(guess.user.id, {
+    for (const guess of monthGuesses) {
+      if (!monthStats.has(guess.user.id)) {
+        monthStats.set(guess.user.id, {
           user: guess.user,
           score: 0,
           maxStreak: 0,
@@ -164,9 +167,10 @@ const app = new Hono()
           present: 0,
           notPresent: 0,
           accuracy: 0,
+          scored: 0,
         });
       }
-      const acc = weekStats.get(guess.user.id)!;
+      const acc = monthStats.get(guess.user.id)!;
       const score = acc.score + guess.score;
       const maxStreak = Math.max(acc.maxStreak, guess.streak);
       const guesses = acc.guesses + 1;
@@ -179,9 +183,9 @@ const app = new Hono()
       const notPresent =
         acc.notPresent +
         guess.feedback.filter((f) => f === Feedback.NotPresent).length;
-      const accuracy =
-        (correct + present / 2) / (correct + present + notPresent);
-      weekStats.set(guess.user.id, {
+      const scored = acc.scored + guess.scores.filter((s) => s > 0).length;
+      const accuracy = scored / (guesses * 5);
+      monthStats.set(guess.user.id, {
         user: acc.user,
         score,
         maxStreak,
@@ -189,14 +193,28 @@ const app = new Hono()
         correct,
         present,
         notPresent,
+        scored,
         accuracy,
       });
     }
-    const sortedWeekStats = Array.from(weekStats.values()).sort(
+    const sortedMonthStats = Array.from(monthStats.values()).sort(
       (a, b) => b.score - a.score,
     );
 
-    return c.html(scoreView({ user, weekStats: sortedWeekStats }));
+    const { rows } = await db.executeQuery<{ start: number; end: number }>(
+      CompiledQuery.raw(
+        `SELECT
+          unixepoch('now', 'start of month', 'subsec') * 1000 as start,
+          unixepoch('now', 'start of month', '1 month', 'subsec') * 1000 as end
+        ;`,
+      ),
+    );
+    const range: [Date, Date] = [
+      new Date(rows[0]!.start),
+      new Date(rows[0]!.end),
+    ];
+
+    return c.html(scoreView({ user, stats: sortedMonthStats, range }));
   });
 
 const server = Bun.serve({
