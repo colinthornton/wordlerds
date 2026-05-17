@@ -15,14 +15,23 @@ export const scoreView = (props: {
     notPresent: number;
     accuracy: number;
   }[];
-  range: [Date, Date];
+  range: [number, number];
 }) =>
   layout({
     user: props.user,
     body: html`<table class="table">
       <thead>
         <caption>
-          ${date(props.range[0])} - ${date(props.range[1])}<br />
+          <span
+            data-text="new Intl.DateTimeFormat('en-US', {dateStyle: 'short', timeStyle: 'short'}).format(${props
+              .range[0]})"
+          ></span>
+          -
+          <span
+            data-text="new Intl.DateTimeFormat('en-US', {dateStyle: 'short', timeStyle: 'short'}).format(${props
+              .range[1]})"
+          ></span>
+          <br />
           <code>🎯 = (scored letters) / (total letters)</code>
         </caption>
         <tr>
@@ -58,9 +67,3 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 1,
 });
 const percent = (fraction: number) => percentFormatter.format(fraction);
-
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "short",
-  timeStyle: "short",
-});
-const date = (raw: Date) => dateFormatter.format(raw);

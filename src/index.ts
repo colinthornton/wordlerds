@@ -209,10 +209,7 @@ const app = new Hono()
         ;`,
       ),
     );
-    const range: [Date, Date] = [
-      new Date(rows[0]!.start),
-      new Date(rows[0]!.end),
-    ];
+    const range: [number, number] = [rows[0]!.start, rows[0]!.end];
 
     return c.html(scoreView({ user, stats: sortedMonthStats, range }));
   });
