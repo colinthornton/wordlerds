@@ -7,12 +7,11 @@ import { CompiledQuery } from "kysely";
 import { z } from "zod";
 import { db } from "./db";
 import { sendGuessWebhook } from "./jobs/guess_webhook_job";
-import { scheduleGameOpenWebhook } from "./jobs/open_game_webhook_job";
+import { getCurrentGame } from "./lib/current_game";
+import type { Observer } from "./lib/observable";
 import {
   Feedback,
   HardModeError,
-  solutions,
-  Wordle,
   WordNotInDictionaryError,
 } from "./lib/wordle";
 import { authMiddleware } from "./middleware/auth";
@@ -47,11 +46,7 @@ const app = new Hono()
   })
   .use<{ Variables: { user: User } }>(signInGuard)
   .get("/", async (c) => {
-    let game = await Game.findLatest();
-    if (!game || game.state !== "IN_PROGRESS") {
-      game = await Game.createWithRandomSolution();
-      scheduleGameOpenWebhook(game);
-    }
+    const game = await getCurrentGame();
 
     return c.html(
       rootView({
@@ -61,10 +56,49 @@ const app = new Hono()
       }),
     );
   })
+  .get("/eventstream", async (c) => {
+    // prevent Bun from killing connection
+    server.timeout(c.req.raw, 0);
+
+    const game = await getCurrentGame();
+    const observer: Observer<Game> = { update() {} };
+    game.subscribe(observer);
+
+    return ServerSentEventGenerator.stream(
+      (s) => {
+        observer.update = (game) => {
+          try {
+            s.patchSignals(JSON.stringify({ word: "" }));
+            s.patchElements(guesses({ guesses: game.guesses }).toString());
+            s.patchElements(keyboard({ letters: game.letters }).toString());
+
+            const lastGuess = game.guesses.at(-1);
+            if (lastGuess && lastGuess.user.id !== c.get("user").id) {
+              toast(s, {
+                title: "You're too slow!",
+                emoji: "1139646440583467140",
+              });
+            }
+          } catch (error) {
+            game.unsubscribe(observer);
+          }
+        };
+
+        s.patchElements(guesses({ guesses: game.guesses }).toString());
+        s.patchElements(keyboard({ letters: game.letters }).toString());
+      },
+      {
+        keepalive: true,
+        onAbort() {
+          game.unsubscribe(observer);
+        },
+      },
+    );
+  })
   .post("/guesses", async (c) => {
     const [reader, game] = await Promise.all([
       ServerSentEventGenerator.readSignals(c.req.raw),
-      Game.findLatest(),
+      getCurrentGame(),
     ]);
     if (!(reader.success && game)) {
       throw new HTTPException(500);
@@ -76,10 +110,7 @@ const app = new Hono()
       );
       if (guessedUserIds.has(c.var.user.id)) {
         return ServerSentEventGenerator.stream((s) => {
-          s.patchElements(alreadyGuessedToast().toString(), {
-            selector: "#toaster",
-            mode: "append",
-          });
+          alreadyGuessedToast(s);
         });
       }
     }
@@ -97,47 +128,26 @@ const app = new Hono()
       sendGuessWebhook(guess.id);
 
       return ServerSentEventGenerator.stream((s) => {
-        s.patchSignals(JSON.stringify({ word: "" }));
-        s.patchElements(guesses({ guesses: game.guesses }).toString());
-        s.patchElements(keyboard({ letters: game.letters }).toString());
-
-        if (game.state !== "IN_PROGRESS") {
-          const toastOptions =
-            game.state === "WIN"
-              ? {
-                  title: `"${signals.word}" was correct!`,
-                  emoji: "966369258735038524",
-                }
-              : {
-                  title: `The word was "${game.solution}"`,
-                  emoji: "1139222642226900992",
-                };
-          s.patchElements(toast(toastOptions).toString(), {
-            selector: "#toaster",
-            mode: "append",
-          });
-        }
-
         if (game.state === "WIN") {
           s.executeScript("fireConfetti()");
+        }
+        if (game.state === "LOSS") {
+          toast(s, {
+            title: `The word was "${game.solution}"`,
+            emoji: "1139222642226900992",
+          });
         }
       });
     } catch (error) {
       if (error instanceof WordNotInDictionaryError) {
         return ServerSentEventGenerator.stream((s) => {
-          s.patchElements(notInDictionaryToast(signals.word).toString(), {
-            selector: "#toaster",
-            mode: "append",
-          });
+          notInDictionaryToast(s, signals.word);
         });
       }
 
       if (error instanceof HardModeError) {
         return ServerSentEventGenerator.stream((s) => {
-          s.patchElements(hardModeToast().toString(), {
-            selector: "#toaster",
-            mode: "append",
-          });
+          hardModeToast(s);
         });
       }
     }

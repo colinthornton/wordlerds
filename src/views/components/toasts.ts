@@ -1,8 +1,9 @@
+import type { ServerSentEventGenerator } from "@starfederation/datastar-sdk/web";
 import { html } from "hono/html";
 import { dictionary } from "../../lib/wordle";
 
-export const alreadyGuessedToast = () => {
-  return toast({
+export const alreadyGuessedToast = (stream: ServerSentEventGenerator) => {
+  return toast(stream, {
     emoji: "1253891674329841677",
     title: "You can't guess twice",
   });
@@ -20,13 +21,13 @@ const hardModeTitles = [
   `How disappointing`,
   `Please use the correct letters`,
 ];
-export const hardModeToast = () => {
+export const hardModeToast = (stream: ServerSentEventGenerator) => {
   const emoji =
     hardModeEmojis[Math.floor(Math.random() * hardModeEmojis.length)];
   const title = hardModeTitles[
     Math.floor(Math.random() * hardModeTitles.length)
   ] as string;
-  return toast({ emoji, title });
+  return toast(stream, { emoji, title });
 };
 
 const notInDictionaryEmojis = [
@@ -36,23 +37,29 @@ const notInDictionaryEmojis = [
   "1230604141936640050",
   "1283610197801173104",
 ];
-export const notInDictionaryToast = (word: string) => {
+export const notInDictionaryToast = (
+  stream: ServerSentEventGenerator,
+  word: string,
+) => {
   const emoji = notInDictionaryEmojis[
     Math.floor(Math.random() * notInDictionaryEmojis.length)
   ] as string;
-  return toast({
+  return toast(stream, {
     emoji,
     title: `There are ${Intl.NumberFormat("en-US").format(dictionary.size)} words in the Wordle dictionary`,
     description: `"${word}" ain't one of them`,
   });
 };
 
-export const toast = (props: {
-  title: string;
-  emoji?: string;
-  description?: string;
-}) =>
-  html`<div
+export const toast = (
+  stream: ServerSentEventGenerator,
+  props: {
+    title: string;
+    emoji?: string;
+    description?: string;
+  },
+) => {
+  const markup = html`<div
     class="toast"
     role="status"
     aria-atomic="true"
@@ -71,4 +78,6 @@ export const toast = (props: {
         ${props.description && html`<p>${props.description}</p>`}
       </section>
     </div>
-  </div>`;
+  </div>`.toString();
+  stream.patchElements(markup, { selector: "#toaster", mode: "append" });
+};

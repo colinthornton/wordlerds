@@ -1,11 +1,12 @@
 import { db } from "../db";
 import type * as Schema from "../db/schema";
+import type { Observer, Subject } from "../lib/observable";
 import { solutions, Wordle } from "../lib/wordle";
 import { scoreGuesses } from "../lib/wordle_score";
 import { Guess } from "./guess";
 import type { User } from "./user";
 
-export class Game {
+export class Game implements Subject<Game> {
   readonly id: Schema.Game["id"];
   readonly created_at: Date;
   readonly updated_at: Date;
@@ -13,6 +14,7 @@ export class Game {
   readonly opens_at: Date | null;
   readonly guesses: Guess[];
   private wordle: Wordle;
+  private observers = new Set<Observer<Game>>();
 
   static async create(newGame: Schema.NewGame) {
     if (!newGame.opens_at) {
@@ -123,6 +125,21 @@ export class Game {
     ).at(-1)!;
     const guess = await Guess.create(scoredGuess, this, user);
     this.guesses.push(guess);
+    this.notify();
     return guess;
+  }
+
+  subscribe(observer: Observer<Game>): void {
+    this.observers.add(observer);
+  }
+
+  unsubscribe(observer: Observer<Game>): void {
+    this.observers.delete(observer);
+  }
+
+  private notify() {
+    for (const observer of this.observers) {
+      observer.update(this);
+    }
   }
 }

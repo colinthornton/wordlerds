@@ -13,7 +13,8 @@ export const rootView = (props: {
 }) =>
   layout({
     user: props.user,
-    body: html`${guesses({ guesses: props.guesses })}${keyboard({
-      letters: props.letters,
-    })}`,
+    body: html`<div data-init="@get('/eventstream')"></div>
+      ${guesses({ guesses: props.guesses })}${keyboard({
+        letters: props.letters,
+      })}`,
   });
