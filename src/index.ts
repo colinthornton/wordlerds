@@ -97,6 +97,10 @@ const app = new Hono()
       sendGuessWebhook(guess.id);
 
       return ServerSentEventGenerator.stream((s) => {
+        s.patchSignals(JSON.stringify({ word: "" }));
+        s.patchElements(guesses({ guesses: game.guesses }).toString());
+        s.patchElements(keyboard({ letters: game.letters }).toString());
+
         if (game.state !== "IN_PROGRESS") {
           const toastOptions =
             game.state === "WIN"
@@ -112,11 +116,11 @@ const app = new Hono()
             selector: "#toaster",
             mode: "append",
           });
-          newWordle();
         }
-        s.patchSignals(JSON.stringify({ word: "" }));
-        s.patchElements(guesses({ guesses: game.guesses }).toString());
-        s.patchElements(keyboard({ letters: game.letters }).toString());
+
+        if (game.state === "WIN") {
+          s.executeScript("fireConfetti()");
+        }
       });
     } catch (error) {
       if (error instanceof WordNotInDictionaryError) {
@@ -218,13 +222,3 @@ const server = Bun.serve({
   port: Bun.env.PORT,
   fetch: app.fetch,
 });
-
-// temporary for testing
-let game: Wordle;
-function newWordle() {
-  const solution = Array.from(solutions)[
-    Math.floor(Math.random() * solutions.size)
-  ] as string;
-  game = new Wordle(solution);
-}
-newWordle();
