@@ -6,7 +6,7 @@ import { guesses } from "./components/guesses";
 import { keyboard } from "./components/keyboard";
 import { layout } from "./layout";
 
-export const rootView = (props: {
+export const gameView = (props: {
   user: User;
   guesses: Guess[];
   letters: Record<string, Feedback>;

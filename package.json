@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "bun run concurrently 'bun dev:server' 'bun dev:css' 'bun dev:js'",
-    "dev:server": "bun run --hot src/index.ts",
+    "dev:server": "bun run --hot src/server.ts",
     "dev:css": "bun run tailwindcss -i src/public/wordlerds.css -o public/wordlerds.css --watch",
     "dev:js": "bun build src/public/wordlerds.ts --outdir public/ --watch",
     "build": "bun run --parallel build:css build:js",

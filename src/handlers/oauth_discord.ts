@@ -1,4 +1,4 @@
-import { type MiddlewareHandler } from "hono";
+import { type Context } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
 import { DiscordAPI } from "../lib/discord_api";
@@ -7,7 +7,7 @@ import { setDiscordSession } from "../lib/discord_session";
 /**
  * OAuth flow for Discord
  */
-export const discordOauth: MiddlewareHandler = async (c) => {
+export async function oAuthDiscord(c: Context) {
   const { code, state } = c.req.query();
   const redirectURI = c.req.url.split("?")[0]!;
   const discordAPI = new DiscordAPI(
@@ -48,7 +48,7 @@ export const discordOauth: MiddlewareHandler = async (c) => {
 
   await setDiscordSession(c, token);
   return c.redirect("/");
-};
+}
 
 function getRandomState() {
   return `${Math.random().toString(36).slice(2)}-${Math.random()

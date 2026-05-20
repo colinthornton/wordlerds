@@ -21,4 +21,4 @@ RUN chown -R 1000:1000 /usr/src/app/sqlite
 USER bun
 EXPOSE 3000/tcp
 VOLUME ["./sqlite:/usr/src/app/sqlite"]
-ENTRYPOINT [ "bun", "run", "src/index.ts" ]
+ENTRYPOINT [ "bun", "run", "src/server.ts" ]
