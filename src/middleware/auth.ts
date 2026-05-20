@@ -1,34 +1,26 @@
 import { type MiddlewareHandler } from "hono";
-import { auth } from "../lib/auth";
+import { getDiscordSession } from "../lib/discord_session";
 import { User } from "../models/user";
+
+const cookieSecret = Bun.env.COOKIE_SECRET!;
 
 /**
  * Set login user data on the context
  */
-export const authMiddleware: MiddlewareHandler = async (c, next) => {
-  if (Bun.env.NODE_ENV === "development") {
-    const user = await User.findById(1);
-    if (user) {
-      c.set("user", user);
-      await next();
-      return;
-    }
-  }
+export const authMiddleware: MiddlewareHandler<{
+  Variables: { user: User | null };
+}> = async (c, next) => {
+  // if (Bun.env.NODE_ENV === "development") {
+  //   const user = await User.findById(1);
+  //   if (user) {
+  //     c.set("user", user);
+  //     await next();
+  //     return;
+  //   }
+  // }
 
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
-
-  if (!session) {
-    c.set("user", null);
-    await next();
-    return;
-  }
-
-  const user = await User.createOrUpdate({
-    discord_user_id: session.user.discordUserId,
-    name: session.user.name,
-    avatar: session.user.image,
-  });
+  const discordUser = await getDiscordSession(c);
+  const user = discordUser ? await User.createOrUpdate(discordUser) : null;
   c.set("user", user);
-
   await next();
 };

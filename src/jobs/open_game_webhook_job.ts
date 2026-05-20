@@ -29,7 +29,7 @@ const sendGameOpenWebhookToDiscord = async (gameId: number) => {
   const webhookUrl = Bun.env.DISCORD_WEBHOOK_URL;
   if (!webhookUrl) return false;
 
-  const link = Bun.env.BETTER_AUTH_URL; // I should rename this but whatever
+  const link = Bun.env.ORIGIN;
   const content = `[AGAPE mode activated](${link})`;
 
   const res = await fetch(webhookUrl, {

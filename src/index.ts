@@ -19,7 +19,6 @@ import { signInGuard } from "./middleware/sign_in_guard";
 import { Game } from "./models/game";
 import { Guess } from "./models/guess";
 import type { User } from "./models/user";
-import { authRoutes } from "./routes/auth";
 import { guesses } from "./views/components/guesses";
 import { keyboard } from "./views/components/keyboard";
 import {
@@ -31,12 +30,13 @@ import {
 import { rootView } from "./views/root";
 import { scoreView } from "./views/score";
 import { signInView } from "./views/sign-in";
+import { discordOauth } from "./middleware/discord_oauth";
 
 const app = new Hono()
   .use(logger())
-  .route("/api/auth", authRoutes)
   .get("/public/*", serveStatic({ root: "./" }))
-  .use<{ Variables: { user: User | null } }>(authMiddleware)
+  .get("/oauth/discord", discordOauth)
+  .use(authMiddleware)
   .get("/sign-in", (c) => {
     if (c.var.user) {
       return c.redirect("/");
@@ -44,7 +44,7 @@ const app = new Hono()
 
     return c.html(signInView());
   })
-  .use<{ Variables: { user: User } }>(signInGuard)
+  .use(signInGuard)
   .get("/", async (c) => {
     const game = await getCurrentGame();
 
