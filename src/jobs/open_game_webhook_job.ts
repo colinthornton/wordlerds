@@ -26,11 +26,17 @@ const sendGameOpenWebhookToDiscord = async (gameId: number) => {
   if (!game) return false;
   if (game.state !== "IN_PROGRESS") return true; // do nothing if the game's already over
 
-  const webhookUrl = Bun.env.DISCORD_WEBHOOK_URL;
-  if (!webhookUrl) return false;
-
   const link = Bun.env.ORIGIN;
   const content = `[AGAPE mode activated](${link})`;
+
+  const webhookUrl = Bun.env.DISCORD_WEBHOOK_URL;
+  if (!webhookUrl) {
+    if (Bun.env.NODE_ENV !== "development") {
+      return false;
+    }
+    console.log("webhook:", content);
+    return true;
+  }
 
   const res = await fetch(webhookUrl, {
     method: "POST",

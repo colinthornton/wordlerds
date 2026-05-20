@@ -22,15 +22,21 @@ const sendGuessWebhookToDiscord = async (guessId: number) => {
   const guess = await Guess.findById(guessId);
   if (!guess) return false;
 
-  const webhookUrl = Bun.env.DISCORD_WEBHOOK_URL;
-  if (!webhookUrl) return false;
-
   const squares = guess.feedback.map((f) => feedbackEmoji[f]).join("");
   const word = guess.word.toUpperCase();
   const link = Bun.env.ORIGIN;
   const mention = `<@${guess.user.discord_user_id}>`;
 
   const content = `[${squares} ${word}](${link}) by ${mention} (+${guess.score})`;
+
+  const webhookUrl = Bun.env.DISCORD_WEBHOOK_URL;
+  if (!webhookUrl) {
+    if (Bun.env.NODE_ENV !== "development") {
+      return false;
+    }
+    console.log("webhook:", content);
+    return true;
+  }
 
   const res = await fetch(webhookUrl, {
     method: "POST",
