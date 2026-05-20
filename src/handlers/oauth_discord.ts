@@ -9,7 +9,7 @@ import { setDiscordSession } from "../lib/discord_session";
  */
 export async function oAuthDiscord(c: Context) {
   const { code, state } = c.req.query();
-  const redirectURI = c.req.url.split("?")[0]!;
+  const redirectURI = `${Bun.env.ORIGIN}${new URL(c.req.url).pathname}`;
   const discordAPI = new DiscordAPI(
     Bun.env.DISCORD_CLIENT_ID!,
     Bun.env.DISCORD_CLIENT_SECRET!,
