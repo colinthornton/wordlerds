@@ -4,13 +4,11 @@ export interface ScoredGuess extends Guess {
   scores: number[];
 }
 
-const enum SolutionLetter {
-  NotFound,
-  Found,
-  Placed,
-}
-
+// Points gained for finding a letter. A letter is considered found when it's the
+// first instance of it being marked "Present" in a game.
 const foundPoints = 1;
+// Points gained for placing a letter. A letter is considered placed when it's
+// marked "Correct".
 const placedPoints = 1;
 
 const wordLength = 5;
@@ -19,53 +17,47 @@ export const scoreGuesses = (
   solution: string,
   guesses: Guess[],
 ): ScoredGuess[] => {
-  const solutionLetters = solution.split("");
-  const solutionStates = [
-    SolutionLetter.NotFound,
-    SolutionLetter.NotFound,
-    SolutionLetter.NotFound,
-    SolutionLetter.NotFound,
-    SolutionLetter.NotFound,
-  ];
+  const prevFoundLetters = new Map(
+    solution.split("").map((letter) => [letter, 0]),
+  );
+  const letterPlaced = new Array<boolean>(wordLength).fill(false);
 
   return guesses.map((guess) => {
-    // indexes map to solution letters, the value is the index of the matching letter in the guess
-    const indexes = [-1, -1, -1, -1, -1];
-    for (let i = 0; i < wordLength; i++) {
-      const feedback = guess.feedback[i]!;
-      if (feedback !== Feedback.Correct) continue;
-      indexes[i] = i;
-    }
-    for (let i = 0; i < wordLength; i++) {
-      const feedback = guess.feedback[i]!;
-      if (feedback !== Feedback.Present) continue;
-      // find first matching letter that is not already marked
-      const letter = guess.word[i]!;
-      for (let j = 0; j < wordLength; j++) {
-        if (indexes[j] !== -1) continue;
-        const solutionLetter = solutionLetters[j];
-        if (solutionLetter !== letter) continue;
-        indexes[j] = i;
-        break;
-      }
-    }
-
     const scores = [0, 0, 0, 0, 0];
+    const foundLetters = new Map<string, number>(
+      solution.split("").map((letter) => [letter, 0]),
+    );
+
     for (let i = 0; i < wordLength; i++) {
-      const state = solutionStates[i];
-      if (state === SolutionLetter.Placed) continue;
+      if (!letterPlaced[i]) continue;
 
-      const guessIndex = indexes[i]!;
-      if (guessIndex === -1) continue;
+      const letter = solution[i]!;
+      foundLetters.set(letter, foundLetters.get(letter)! + 1);
+    }
 
-      const feedback = guess.feedback[guessIndex]!;
-      if (state === SolutionLetter.NotFound) {
-        scores[guessIndex]! += foundPoints;
-        solutionStates[i] = SolutionLetter.Found;
+    for (let i = 0; i < wordLength; i++) {
+      const feedback = guess.feedback[i];
+      if (feedback === Feedback.NotPresent) continue;
+
+      const letter = guess.word[i]!;
+      if (letterPlaced[i] && letter === solution[i]!) continue;
+      foundLetters.set(letter, foundLetters.get(letter)! + 1);
+
+      const newlyFound =
+        foundLetters.get(letter)! > prevFoundLetters.get(letter)!;
+      if (newlyFound) {
+        scores[i]! += foundPoints;
       }
+
       if (feedback === Feedback.Correct) {
-        scores[guessIndex]! += placedPoints;
-        solutionStates[i] = SolutionLetter.Placed;
+        letterPlaced[i] = true;
+        scores[i]! += placedPoints;
+      }
+    }
+
+    for (const [letter, count] of foundLetters) {
+      if (count > prevFoundLetters.get(letter)!) {
+        prevFoundLetters.set(letter, count);
       }
     }
 

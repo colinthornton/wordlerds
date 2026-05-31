@@ -22,12 +22,18 @@ describe(".findAllByGame", () => {
         {
           word: "hello",
           feedback: "22222",
+          scores: "00000",
+          total_score: 0,
+          streak: 0,
           game_id: game.id,
           user_id: user.id,
         },
         {
           word: "gross",
           feedback: "00100",
+          scores: "00000",
+          total_score: 0,
+          streak: 0,
           game_id: game.id,
           user_id: user.id,
         },
