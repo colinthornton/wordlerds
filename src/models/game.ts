@@ -1,5 +1,6 @@
 import { db } from "../db";
 import type * as Schema from "../db/schema";
+import { scheduleGameOpenWebhook } from "../jobs/open_game_webhook_job";
 import type { Observer, Subject } from "../lib/observable";
 import { solutions, Wordle } from "../lib/wordle";
 import { scoreGuesses } from "../lib/wordle_score";
@@ -26,12 +27,16 @@ export class Game implements Subject<Game> {
       newGame.opens_at = new Date(Date.now() + delay).toISOString();
     }
 
-    const game = await db
+    const data = await db
       .insertInto("games")
       .values(newGame)
       .returningAll()
       .executeTakeFirstOrThrow();
-    return new Game(game, []);
+    const game = new Game(data, []);
+
+    scheduleGameOpenWebhook(game);
+
+    return game;
   }
 
   /**
