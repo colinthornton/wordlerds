@@ -20,6 +20,7 @@ window.fireConfetti = () => {
 window.addEventListener("keydown", (e: KeyboardEvent) => {
   const { key, altKey, ctrlKey, metaKey, shiftKey } = e;
   if (altKey || ctrlKey || metaKey || shiftKey) return;
+  e.preventDefault();
   switch (key) {
     case "Backspace":
       window.dispatchEvent(new CustomEvent("backspacekeydown"));

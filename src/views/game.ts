@@ -13,10 +13,14 @@ export const gameView = (props: {
 }) =>
   layout({
     user: props.user,
-    body: html`<div
-        data-init="@get('/eventstream')"
+    body: html`<div data-init="@get('/eventstream')"></div>
+      <div
         data-on:enterkeydown__window="$word.length === 5 && @post('/guesses')"
+      ></div>
+      <div
         data-on:backspacekeydown__window="$word = $word.length === 0 ? $word : $word.slice(0, -1)"
+      ></div>
+      <div
         data-on:letterkeydown__window="$word = $word.length < 5 ? $word + evt.detail.key : $word"
       ></div>
       ${guesses({ guesses: props.guesses })}${keyboard({
