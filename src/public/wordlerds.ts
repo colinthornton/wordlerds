@@ -28,7 +28,7 @@ window.addEventListener("keydown", (e: KeyboardEvent) => {
       window.dispatchEvent(new CustomEvent("enterkeydown"));
       break;
     default:
-      if (!/[a-z]/.test(key)) break;
+      if (!/^[a-z]$/.test(key)) break;
       window.dispatchEvent(
         new CustomEvent("letterkeydown", { detail: { key } }),
       );
