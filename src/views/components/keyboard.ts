@@ -27,7 +27,7 @@ const button = (key: string, letters: Record<string, Feedback>) => {
     case "Enter":
       return html`<button
         class="btn-icon flex-[1.5] uppercase font-bold h-14 p-0 text-[20px]"
-        data-on:pointerdown="$word.length === 5 && @post('/guesses')"
+        data-on:pointerdown="window.dispatchEvent(new CustomEvent('enterkeydown'))"
       >
         <svg
           class="size-5"
@@ -49,7 +49,7 @@ const button = (key: string, letters: Record<string, Feedback>) => {
     case "Backspace":
       return html`<button
         class="btn-icon flex-[1.5] uppercase font-bold h-14 p-0"
-        data-on:pointerdown="$word = $word.length === 0 ? $word : $word.slice(0, -1)"
+        data-on:pointerdown="window.dispatchEvent(new CustomEvent('backspacekeydown'))"
       >
         <svg
           class="size-5"
@@ -83,7 +83,7 @@ const button = (key: string, letters: Record<string, Feedback>) => {
       }
       return html`<button
         class="btn flex-1 uppercase font-bold h-14 p-0 ${color}"
-        data-on:pointerdown="$word = $word.length < 5 ? $word + '${key}' : $word"
+        data-on:pointerdown="window.dispatchEvent(new CustomEvent('letterkeydown', { detail: { key: '${key}' } }))"
       >
         ${key}
       </button>`;
